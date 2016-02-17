@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8" ?> 
+<XML>
+  <brief>
+    <adviseur>
+      <relatienummer>123</relatienummer>
+      <naam>Andre</naam>
+      <kopiegeprint>J</kopiegeprint>
+      <isincasserend>J</isincasserend>
+    </adviseur>
+    <contactpersoon>
+      <achternaam>Wessel</achternaam>
+      <voorletters>A.H.J.</voorletters>
+      <salesmanager>
+        <voorletters>A.A.A.</voorletters>
+        <naam>ddddd</naam>
+      </salesmanager>
+    </contactpersoon>
+  </brief>
+</XML>
