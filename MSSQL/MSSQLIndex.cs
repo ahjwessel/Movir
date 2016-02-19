@@ -9,24 +9,22 @@ namespace MSSQL
 {
     public class MSSQLIndex : SQLIndex
     {
+        public string Tablename { get; internal set; }
         public override string CreateLine
         {
             get
             {
-                string varIndexTypeStart = "";
+                string varIndexTypeStart = "CREATE ";
                 switch (this.IndexType)
                 {
                     case SQLIndexTypes.PrimaryKey:
-                        varIndexTypeStart = "PRIMARY KEY ";
-                        break;
+                        throw new NotImplementedException();//Wordt gedaan dmv create field
                     case SQLIndexTypes.NormalIndex:
+                    case SQLIndexTypes.FullText:
                         varIndexTypeStart = "INDEX " + this.Name + " ";
                         break;
                     case SQLIndexTypes.UniqueIndex:
                         varIndexTypeStart = "UNIQUE INDEX " + this.Name + " ";
-                        break;
-                    case SQLIndexTypes.FullText:
-                        varIndexTypeStart = "FULLTEXT INDEX " + this.Name + " ";
                         break;
                 }
                 System.Text.StringBuilder sbNames = new System.Text.StringBuilder();
@@ -44,8 +42,7 @@ namespace MSSQL
                     sbNames.Append("," + varToAdd);
                 }
                 string varTotal = varIndexTypeStart;
-                if (sbNames.Length > 0)
-                    varTotal += "(" + sbNames.ToString().Substring(1) + ")";
+                varTotal += "ON "+this.Tablename+ " (" + sbNames.ToString().Substring(1) + ")";
 
                 return varTotal;
             }

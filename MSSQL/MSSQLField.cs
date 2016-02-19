@@ -14,6 +14,7 @@ namespace MSSQL
             {
                 var varName = this.Name;
                 var varType = this.Type.ToString();
+                var varPrimary = this.IsPrimaryKey ? "PRIMARY KEY " : "";
 
                 var varIsNull = "";
                 if (!this.AllowDBNull)
@@ -21,7 +22,7 @@ namespace MSSQL
 
                 var varDefaultValue = " DEFAULT " + this.SQLInitValue;
 
-                return varName + " " + varType + varIsNull + varDefaultValue;
+                return varName + " " + varType + varPrimary + varIsNull + varDefaultValue;
             }
         }
 
