@@ -8,7 +8,7 @@ using System.Data.Common;
 
 namespace Common.Templates
 {
-    public abstract class SQLConnection: IDisposable
+    public abstract class SQLConnector: IDisposable
     {
         #region Properties
         internal protected DbConnection DBConnection { get; private set; }
@@ -117,9 +117,10 @@ namespace Common.Templates
         }
         #endregion
 
-        #region CreateDatabase/SelectDatabase/Execute/OpenRecordset
+        #region CreateDatabase/SelectDatabase/DeleteTable/Execute/OpenRecordset
         public abstract bool CreateDatabase(string parDatabaseName);
         public abstract bool SelectDatabase(string parDatabase);
+        public abstract void DeleteTable(string parTablename);
         public int Execute(string parSQL)
         {
             int varReturn = int.MinValue;
@@ -318,9 +319,9 @@ namespace Common.Templates
         #endregion
 
         public static string getEnumToTextSubquery(string parFieldname,
-                                           bool parEnumvalueAsText,
-                                           Type parEnum,
-                                           string parUnknownText)
+                                                   bool parEnumvalueAsText,
+                                                   Type parEnum,
+                                                   string parUnknownText)
         {
             //CASE value WHEN [compare_value] THEN result [WHEN [compare_value] THEN result ...] [ELSE result] END 
             string varReturn = "";
@@ -344,7 +345,7 @@ namespace Common.Templates
             this.CurrentUsername = null;
         }
 
-        public SQLConnection()
+        public SQLConnector()
         {
             this.TimeoutOpenRecordsetInSeconden = 30;
             this.TimeoutExecuteInSeconden = 180;

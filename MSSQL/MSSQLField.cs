@@ -1,35 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Common.Templates;
 using System.Data;
+using Common.Templates;
 
 namespace MSSQL
 {
-    public enum MSSQLFieldTypes
-    {
-        Bigint,
-        Integer,
-        Smallint,//Short
-        Tinyint,//Byte
-        Bit,
-        Decimal,
-        Money,
-        Smallmoney,
-        Float,
-        Real,
-        Datetime,
-        Smalldatetime,
-        Date,
-        Time,
-        Text,
-        NText,//Unicode
-        Binary,
-        Image,
-        uniqueidentifier//GUID
-    }
     public class MSSQLField:SQLField
     {
         public MSSQLFieldTypes Type { get; protected set; }
@@ -51,6 +25,16 @@ namespace MSSQL
             }
         }
 
+        protected override string ConvertValueToSQL(object parValue)
+        {
+            return MSSQLConnector.ConvertValueToSQL(this.Type, parValue, this.AllowDBNull);
+        }
+
+        protected override object ConvertSQLToValue(object parSQLValue)
+        {
+            return MSSQLConnector.ConvertSQLToValue(this.Type, parSQLValue);
+        }
+
         public MSSQLField(string parName, MSSQLFieldTypes parType,bool parAllowDBNull, object parInitValue)
             :base(parName,parAllowDBNull,parInitValue)
         {
@@ -59,23 +43,7 @@ namespace MSSQL
         public MSSQLField(int parFieldnumber, DataTable parSchemaTable)
             :base(parFieldnumber,parSchemaTable)
         {
-            //Dit testen!!!!!!
             this.Type = (MSSQLFieldTypes)Enum.Parse(typeof(MSSQLFieldTypes), parSchemaTable.Rows[parFieldnumber - 1]["ProviderType"].ToString());
-        }
-
-        protected override string ConvertValueToSQL(object parValue)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override object ConvertSQLToValue(string parSQLValue)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void Refresh(DataRow parRow)
-        {
-            throw new NotImplementedException();
         }
     }
 }

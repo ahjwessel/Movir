@@ -37,15 +37,15 @@ namespace Common.Templates
             }
         }
 
-        internal void SubmitValue()
+        internal protected void SubmitValue()
         {
             this.OldValue = GetCloneValue(this.Value);
         }
-        internal void RollbackToOldValue()
+        internal protected void RollbackToOldValue()
         {
             this.Value = GetCloneValue(this.OldValue);
         }
-        internal void RollbackToInitValue()
+        internal protected void RollbackToInitValue()
         {
             this.Value = GetCloneValue(this.InitValue);
         }

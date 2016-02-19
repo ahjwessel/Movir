@@ -46,11 +46,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\Templates\SQLIndex.cs" />
+    <Compile Include="Common\Templates\SQLTable.cs" />
     <Compile Include="MSSQLAutonumberField.cs" />
-    <Compile Include="MSSQLConnection.cs" />
+    <Compile Include="MSSQLConnector.cs" />
+    <Compile Include="MSSQLIndex.cs" />
     <Compile Include="MSSQLRecord.cs" />
     <Compile Include="MSSQLRecordset.cs" />
-    <Compile Include="Common\Templates\SQLConnection.cs" />
+    <Compile Include="Common\Templates\SQLConnector.cs" />
     <Compile Include="MSSQLField.cs" />
     <Compile Include="MSSQLFields.cs" />
     <Compile Include="MSSQLTable.cs" />
@@ -71,6 +74,9 @@
     <Compile Include="Common\Templates\SQLRecord.cs" />
     <Compile Include="Common\Templates\SQLRecordset.cs" />
     <Compile Include="Common\Templates\Table.cs" />
+    <EmbeddedResource Include="Form1.resx">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

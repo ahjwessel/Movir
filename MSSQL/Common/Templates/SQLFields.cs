@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Common.Templates
 {
-    public class SQLFields:Fields
+    public abstract class SQLFields:Fields
     {
         new public SQLField this[string parName]
         {
@@ -25,7 +25,7 @@ namespace Common.Templates
         }
 
         #region getAddString/getUpdateString/getFieldsString/getValuesString
-        internal string getInsertString()
+        internal protected string getInsertString()
         {
             StringBuilder sbFields = new StringBuilder();
             StringBuilder sbValues = new StringBuilder();
@@ -37,7 +37,7 @@ namespace Common.Templates
                 {
                     if (sbFields.Length > 0)
                         sbFields.Append(",");
-                    sbFields.Append("`" + fld.Name + "`");
+                    sbFields.Append(fld.Name);
 
                     if (sbValues.Length > 0)
                         sbValues.Append(",");
@@ -59,7 +59,7 @@ namespace Common.Templates
                         sbString.Append(",");
                     }
 
-                    sbString.Append("`" + fld.Name + "`=");
+                    sbString.Append(fld.Name + "=");
                     sbString.Append(fld.SQLValue);
                 }
             }
@@ -83,7 +83,7 @@ namespace Common.Templates
                     {
                         sbWhere.Append(" AND ");
                     }
-                    sbWhere.Append("`" + fld.Name + "`=" + fld.SQLValue);
+                    sbWhere.Append(fld.Name + "=" + fld.SQLValue);
                 }
             }
 
@@ -92,7 +92,7 @@ namespace Common.Templates
         #endregion
 
         #region Refresh/ClearValues
-        internal void Refresh(DataRow parRow)
+        internal protected void Refresh(DataRow parRow)
         {
             foreach (SQLField fld in this)
             {

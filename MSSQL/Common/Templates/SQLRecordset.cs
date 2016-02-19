@@ -8,7 +8,7 @@ using System.Data.Common;
 
 namespace Common.Templates
 {
-    public enum enmRecordsetState : byte
+    public enum RecordsetStates : byte
     {
         Viewing = 0,
         Appending = 1,
@@ -18,7 +18,7 @@ namespace Common.Templates
 
     public abstract class SQLRecordset:IDisposable
     {
-        public SQLConnection Connection { get; protected set; }
+        public SQLConnector Connection { get; protected set; }
         public DataTable SchemaTable{get; protected set;}
         public DataSet DataSet { get; protected set; }
         public string Tablename { get; protected set; }
@@ -27,7 +27,7 @@ namespace Common.Templates
         public int CurrentRecordNumber{get; protected set;}
         protected SQLRecord CurrentRecord { get; set; }
         protected ArrayList RecordsDeleted { get; set; }
-        public enmRecordsetState State { get; protected set; }
+        public RecordsetStates State { get; protected set; }
 
         public int AbsolutePosition
         {
@@ -138,7 +138,7 @@ namespace Common.Templates
             else
             {
                 this.CurrentRecord.ClearValues();
-                this.State = enmRecordsetState.Deleted;
+                this.State = RecordsetStates.Deleted;
             }
         }
 
@@ -180,12 +180,12 @@ namespace Common.Templates
         public void AddNew()
         {
             this.CurrentRecordNumber = 0;
-            this.State = enmRecordsetState.Appending;
+            this.State = RecordsetStates.Appending;
             this.Fields.RollbackToInitValues();
         }
         public void Edit()
         {
-            this.State = enmRecordsetState.Editing;
+            this.State = RecordsetStates.Editing;
             this.Fields.SubmitValues();
         }
         public void Update()
@@ -194,12 +194,12 @@ namespace Common.Templates
             int varExecuted = -1;
             switch (this.State)
             {
-                case enmRecordsetState.Appending:
+                case RecordsetStates.Appending:
                     varSQL = this.getInsertString();
                     if (varSQL != "")
                         varExecuted = this.Connection.Execute(varSQL);
                     break;
-                case enmRecordsetState.Editing:
+                case RecordsetStates.Editing:
                     varSQL = this.getUpdateString();
                     if (varSQL != "")
                         varExecuted = this.Connection.Execute(varSQL);
@@ -208,7 +208,7 @@ namespace Common.Templates
 
             if (varExecuted > int.MinValue)
             {
-                this.State = enmRecordsetState.Viewing;
+                this.State = RecordsetStates.Viewing;
                 this.Fields.SubmitValues();
             }
         }
@@ -216,7 +216,7 @@ namespace Common.Templates
         {
             if (this.Connection.Execute(this.getDeleteString()) > int.MinValue)
             {
-                this.State = enmRecordsetState.Viewing;
+                this.State = RecordsetStates.Viewing;
 
                 if (this.RecordsDeleted == null)
                     this.RecordsDeleted = new ArrayList();
@@ -228,7 +228,7 @@ namespace Common.Templates
         public void CancelUpdate()
         {
             this.Fields.RollbackToOldValues();
-            this.State = enmRecordsetState.Viewing;
+            this.State = RecordsetStates.Viewing;
         }
         #endregion
 
@@ -311,7 +311,7 @@ namespace Common.Templates
                 return "UPDATE " + varSelectedDatabasePart + this.Tablename + varUpdateString;
             }
         }
-        internal string getDeleteString()
+        internal virtual string getDeleteString()
         {
             if (this.CurrentRecord == null)
                 return "";
@@ -321,7 +321,7 @@ namespace Common.Templates
                 if (varSelectedDatabasePart != "")
                     varSelectedDatabasePart = varSelectedDatabasePart + ".";
 
-                return "DELETE FROM " + varSelectedDatabasePart + this.Tablename + " WHERE " + this.Fields.getPrimaryKeyWhere();
+                return "DELETE * FROM " + varSelectedDatabasePart + this.Tablename + " WHERE " + this.Fields.getPrimaryKeyWhere();
             }
         }
         #endregion
@@ -337,7 +337,7 @@ namespace Common.Templates
             }
             catch
             { }
-            this.State = enmRecordsetState.Viewing;
+            this.State = RecordsetStates.Viewing;
             GC.SuppressFinalize(this);
         }
         private void DisposeCurrentRecord()
@@ -358,7 +358,7 @@ namespace Common.Templates
         }
         #endregion
 
-        internal SQLRecordset(SQLConnection parConnection)
+        internal SQLRecordset(SQLConnector parConnection)
         {
             this.Connection = parConnection;
         }

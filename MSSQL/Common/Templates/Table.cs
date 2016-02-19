@@ -53,16 +53,6 @@ namespace Common.Templates
             this.SetFlags(true, true);
         }
 
-        protected string[] getFieldnames()
-        {
-            string[] mtx = new string[this.Fields.Count];
-
-            for (int varCounter = 0; varCounter < this.Fields.Count; varCounter++)
-            {
-                mtx[varCounter] = this.Fields[varCounter].Name;
-            }
-            return mtx;
-        }
         protected void SetFlags(bool parIsNew, bool parIsFound)
         {
             this.IsNew = parIsNew;

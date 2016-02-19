@@ -16,7 +16,7 @@ namespace MSSQL
             return new MSSQLRecord(parSchemaTable, parDataSet);
         }
 
-        public MSSQLRecordset(MSSQLConnection parConnection)
+        public MSSQLRecordset(MSSQLConnector parConnection)
             :base(parConnection)
         { }
     }

@@ -71,21 +71,21 @@ namespace Common.Templates
             }
         }
 
-        internal void SubmitValues()
+        internal protected void SubmitValues()
         {
             foreach(Field fld in this)
             {
                 fld.SubmitValue();
             }
         }
-        internal void RollbackToOldValues()
+        internal protected void RollbackToOldValues()
         {
             foreach (Field fld in this)
             {
                 fld.RollbackToOldValue();
             }
         }
-        internal void RollbackToInitValues()
+        internal protected void RollbackToInitValues()
         {
             foreach (Field fld in this)
             {

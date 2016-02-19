@@ -16,5 +16,12 @@ namespace MSSQL
         {
             InitializeComponent();
         }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            var sql = new MSSQLConnector();
+            sql.OpenConnection("LOCALHOST", 0, "", "");
+            return;
+        }
     }
 }

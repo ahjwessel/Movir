@@ -9,6 +9,7 @@ namespace Common.Templates
 {
     public abstract class SQLField:Field
     {
+        #region Properties
         public int FieldIndex
         {
             get
@@ -23,10 +24,6 @@ namespace Common.Templates
             get
             {
                 return ConvertValueToSQL(this.Value);
-            }
-            set
-            {
-                this.Value = ConvertSQLToValue(value);
             }
         }
         public string SQLOldValue
@@ -47,25 +44,41 @@ namespace Common.Templates
         public bool IsAutonumber { get; protected set; }
         public bool AllowDBNull { get; protected set; }
         public abstract string CreateLine { get; }
+        #endregion
         protected abstract string ConvertValueToSQL(object parValue);
-        protected abstract object ConvertSQLToValue(string parSQLValue);
+        protected abstract object ConvertSQLToValue(object parSQLValue);
 
-        public abstract void Refresh(DataRow parRow);
+        public void Refresh(DataRow parRow)
+        {
+            this.Value = this.ConvertSQLToValue(parRow[this.FieldIndex]);
+            this.SubmitValue();
+        }
+        private static bool getBool(object parValue)
+        {
+            try
+            {
+                return (bool)parValue;
+            }
+            catch
+            {
+                return false;
+            }
+        }
 
         public SQLField(string parName, bool parAllowDBNull, object parInitValue)
             :base(parName,parInitValue)
         {
             this.AllowDBNull = parAllowDBNull;
         }
-
         public SQLField(int parFieldnumber, DataTable parSchemaTable)
-		:base(parSchemaTable.Rows[parFieldnumber-1]["ColumnName"].ToString(),null)
-		{
+        : base(parSchemaTable.Rows[parFieldnumber - 1]["ColumnName"].ToString(), null)
+        {
             this.Fieldnumber = parFieldnumber;
             this.Value = null;
-            this.IsPrimaryKey = (bool)parSchemaTable.Rows[parFieldnumber - 1]["IsKey"];
-            this.IsAutonumber = (bool)parSchemaTable.Rows[parFieldnumber - 1]["IsAutoIncrement"];
-            this.AllowDBNull = (bool)parSchemaTable.Rows[parFieldnumber - 1]["AllowDBNull"];
+
+            this.IsPrimaryKey = getBool(parSchemaTable.Rows[parFieldnumber - 1]["IsKey"]);
+            this.IsAutonumber = getBool(parSchemaTable.Rows[parFieldnumber - 1]["IsAutoIncrement"]);
+            this.AllowDBNull = getBool(parSchemaTable.Rows[parFieldnumber - 1]["AllowDBNull"]);
         }
     }
 }
