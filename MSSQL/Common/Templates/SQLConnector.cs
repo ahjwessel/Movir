@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Data;
 using System.Data.Common;
 
@@ -16,7 +12,7 @@ namespace Common.Templates
         public int CurrentPort { get; private set; }
         public string CurrentUsername { get; private set; }
         public string CurrentPassword { get; private set; }
-        public string SelectedDatabase { get; protected set; }
+        public string SelectedDatabase { get; private set; }
         
         public Exception LastException{get; protected set;}
         public int TimeoutOpenRecordsetInSeconden { get; set; }
@@ -113,13 +109,34 @@ namespace Common.Templates
             {
                 this.DBConnection.Close();
                 this.DBConnection.Dispose();
+                this.DBConnection = null;
             }
         }
         #endregion
 
         #region CreateDatabase/SelectDatabase/DeleteTable/Execute/OpenRecordset
-        public abstract bool CreateDatabase(string parDatabaseName);
-        public abstract bool SelectDatabase(string parDatabase);
+        public bool CreateDatabase(string parDatabaseName)
+        {
+            if (this.pCreateDatabase(parDatabaseName))
+            {
+                this.SelectedDatabase = parDatabaseName;
+                return true;
+            }
+            else
+                return false;
+        }
+        protected abstract bool pCreateDatabase(string parDatabaseName);
+        public bool SelectDatabase(string parDatabase)
+        {
+            if (this.pSelectDatabase(parDatabase))
+            {
+                this.SelectedDatabase = parDatabase;
+                return true;
+            }
+            else
+                return false;
+        }
+        protected abstract bool pSelectDatabase(string parDatabase);
         public abstract void DeleteTable(string parTablename);
         public int Execute(string parSQL)
         {
@@ -127,15 +144,17 @@ namespace Common.Templates
                 return int.MinValue;
 
             int varReturn = int.MinValue;
-            try
+            using (var cmd = this.CreateCommand(parSQL))
             {
-                var cmd = this.CreateCommand(parSQL);
-                cmd.CommandTimeout = this.TimeoutExecuteInSeconden;
-                varReturn = cmd.ExecuteNonQuery();
-            }
-            catch (Exception ex)
-            {
-                throw ex;
+                try
+                {
+                    cmd.CommandTimeout = this.TimeoutExecuteInSeconden;
+                    varReturn = cmd.ExecuteNonQuery();
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
             }
 
             return varReturn;
@@ -287,16 +306,20 @@ namespace Common.Templates
         #region Check function
         public bool HasDatabase(string parName)
         {
-            foreach (string varTableName in this.Databases)
+            var DatabaseNames = this.Databases;
+            if (DatabaseNames != null)
             {
-                if (varTableName.ToLower() == parName.ToLower())
-                    return true;
+                foreach (string DatabaseName in DatabaseNames)
+                {
+                    if (DatabaseName.ToLower() == parName.ToLower())
+                        return true;
+                }
             }
             return false;
         }
         public bool HasTable(string parName)
         {
-            string[] varTableNames = this.Tables;
+            var varTableNames = this.Tables;
             if (varTableNames != null)
             {
                 foreach (string varTableName in varTableNames)
@@ -309,15 +332,17 @@ namespace Common.Templates
         }
         public bool HasNoRecords(string parSQL)
         {
-            SQLRecordset rec = this.OpenRecordset(parSQL);
-            if (rec != null)
+            bool ReturnValue = false;
+            using (var rec = this.OpenRecordset(parSQL))
             {
-                bool varReturnValue = rec.EOF;
-                rec.Dispose();
-                return varReturnValue;
+                if (rec != null)
+                {
+                    ReturnValue = rec.EOF;
+                    rec.Dispose();
+                }
             }
 
-            return true;
+            return ReturnValue;
         }
         #endregion
 

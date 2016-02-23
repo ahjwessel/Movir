@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 
@@ -26,7 +23,7 @@ namespace Common.Templates
         public int RecordCount { get; protected set; }
         public int CurrentRecordNumber{get; protected set;}
         protected SQLRecord CurrentRecord { get; set; }
-        protected ArrayList RecordsDeleted { get; set; }
+        protected List<int> RecordsDeleted { get; private set; }
         public RecordsetStates State { get; protected set; }
 
         public int AbsolutePosition
@@ -59,7 +56,7 @@ namespace Common.Templates
         }
 
         #region OpenRecordset/CloseRecordset
-        public bool OpenRecordset(string parSQL)
+        protected internal bool OpenRecordset(string parSQL)
         {
             this.SQL = parSQL;
             return this.Requery();
@@ -82,9 +79,7 @@ namespace Common.Templates
                 this.Tablename = this.SchemaTable.Rows[0]["BaseTableName"].ToString();
                 this.CurrentRecord = this.CreateRecord(this.SchemaTable, this.DataSet);
                 if (this.RecordCount > 0)
-                {
                     this.MoveFirst();
-                }
             }
             catch (Exception ex)
             {
@@ -121,7 +116,7 @@ namespace Common.Templates
             this.RecordCount = 0;
             this.CurrentRecordNumber = 0;
             this.DisposeCurrentRecord();
-            this.DisposeDeletedRecords();
+            this.RecordsDeleted.Clear();
 
             if (parResetSQL)
                 this.SQL = "";
@@ -218,9 +213,6 @@ namespace Common.Templates
             {
                 this.State = RecordsetStates.Viewing;
 
-                if (this.RecordsDeleted == null)
-                    this.RecordsDeleted = new ArrayList();
-
                 this.RecordsDeleted.Add(this.CurrentRecordNumber);
                 this.MoveFirst();
             }
@@ -252,37 +244,33 @@ namespace Common.Templates
             if (parNumberOfRecords <= 0)
                 return null;
 
-            ArrayList arrValues = new ArrayList();
-            object[] mtxFieldValues = null;
+            var AllValues = new List<object[]>();
+            object[] FieldValues = null;
             for (int varRecordcounter = 1; varRecordcounter <= parNumberOfRecords; varRecordcounter++)
             {
                 this.CurrentRecordNumber = varRecordcounter + parStartFrom;
-                if (this.RecordsDeleted == null || !this.RecordsDeleted.Contains(this.CurrentRecordNumber))
+                if (!this.RecordsDeleted.Contains(this.CurrentRecordNumber))
                 {
                     this.ReadCurrentRecord();
-                    mtxFieldValues = new object[this.Fields.Count];
-                    for (int varFieldcounter = 0; varFieldcounter < this.Fields.Count; varFieldcounter++)
-                    {
-                        mtxFieldValues[varFieldcounter] = this.Fields[varFieldcounter ].Value;
-                    }
-                    arrValues.Add(mtxFieldValues);
+                    FieldValues = this.Fields.getValues();
+                    AllValues.Add(FieldValues);
                 }
             }
 
-            if (arrValues.Count == 0)
+            if (AllValues.Count == 0)
                 return null;
 
-            object[,] mtxValues = new object[this.Fields.Count, arrValues.Count];
-            for (int varRecordcounter = 0; varRecordcounter < arrValues.Count; varRecordcounter++)
+            object[,] mtxValues = new object[this.Fields.Count, AllValues.Count];
+            for (int varRecordcounter = 0; varRecordcounter < AllValues.Count; varRecordcounter++)
             {
-                mtxFieldValues = (object[])arrValues[varRecordcounter];
+                FieldValues = (object[])AllValues[varRecordcounter];
                 for (int varFieldcounter = 0; varFieldcounter < this.Fields.Count; varFieldcounter++)
                 {
-                    mtxValues[varFieldcounter, varRecordcounter] = mtxFieldValues[varFieldcounter];
+                    mtxValues[varFieldcounter, varRecordcounter] = FieldValues[varFieldcounter];
                 }
             }
 
-            arrValues.Clear();
+            AllValues.Clear();
 
             return mtxValues;
         }
@@ -293,6 +281,7 @@ namespace Common.Templates
         {
             this.Connection = null;
             this.SQL = null;
+            this.RecordsDeleted.Clear();
             try
             {
                 this.CloseRecordset();
@@ -310,19 +299,12 @@ namespace Common.Templates
                 this.CurrentRecord = null;
             }
         }
-        private void DisposeDeletedRecords()
-        {
-            if (this.RecordsDeleted != null)
-            {
-                this.RecordsDeleted.Clear();
-                this.RecordsDeleted = null;
-            }
-        }
         #endregion
 
         internal SQLRecordset(SQLConnector parConnection)
         {
             this.Connection = parConnection;
+            this.RecordsDeleted = new List<int>();
         }
     }
 }

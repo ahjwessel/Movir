@@ -39,7 +39,7 @@ namespace MSSQL
 
         public tblTesters() : 
             base("tblTesters", new MSSQLAutonumberField("ID"), 
-                new MSSQLTextField("Naam",255,""),
+                new MSSQLTextField("Naam",255,true,""),
                 new MSSQLField("Nummer",SqlDbType.Int,0),
                 new MSSQLField("Datum",SqlDbType.Date,DateTime.Now.Date),
                 new MSSQLField("Decimal",SqlDbType.Float,0),

@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Common.Templates;
+﻿using Common.Templates;
 using System.Data;
-using System.Collections;
 
 namespace MSSQL
 {
@@ -34,9 +28,7 @@ namespace MSSQL
             _fields = new MSSQLField[parSchemaTable.Rows.Count];
             for (int varCounter = 0; varCounter < parSchemaTable.Rows.Count; varCounter++)
             {
-                _fields[varCounter] = new MSSQLField(varCounter + 1, parSchemaTable);
-                if (parDataSet != null && parDataSet.Tables[0].Rows.Count > 0)
-                    this[varCounter].Refresh(parDataSet.Tables[0].Rows[0]);
+                _fields[varCounter] = new MSSQLField(varCounter, parSchemaTable);
             }
         }
     }

@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Common.Templates
 {
@@ -34,33 +30,27 @@ namespace Common.Templates
             }
         }
 
-        protected virtual void RollbackToInitValues()
+        protected void SubmitValues()
         {
-            this.EmptyValues();
+            this.Fields.SubmitValues();
         }
-        protected virtual void EmptyValues()
+        protected virtual void RollbackToInitValues()
         {
             this.Fields.RollbackToInitValues();
         }
         public virtual void CreateNew()
         {
-            this.EmptyValues();
+            this.RollbackToInitValues();
             this.SetFlags(true, true);
         }
-
         public virtual void CreateCopy()
         {
             this.SetFlags(true, true);
         }
-
         protected void SetFlags(bool parIsNew, bool parIsFound)
         {
             this.IsNew = parIsNew;
             this.IsFound = parIsFound;
-        }
-        protected void SubmitValues()
-        {
-            this.Fields.SubmitValues();
         }
 
         public virtual void Dispose()

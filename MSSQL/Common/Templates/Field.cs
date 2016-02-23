@@ -1,29 +1,54 @@
 ﻿using System;
 using System.IO;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Common.Templates
 {
     public abstract class Field : IDisposable
     {
+        //Deze variabelen worden gebruikt om IsDirty te bepalen en 
+        //Rollback.. en SubmitValues te regelen.
+        //Dit is sneller omdat de properties wel eens overrided kunnen zijn
+        object _InitValue = null;
+        object _Value = null;
+        object _OldValue = null;
         public string Name { get; private set; }
-        public object InitValue { get; private set; }
-        public object Value { get; set; }
-        public object OldValue { get; set; }
+        public virtual object InitValue
+        {
+            get
+            {
+                return _InitValue;
+            }
+        }
+        public virtual object Value
+        {
+            get
+            {
+                return _Value;
+            }
+            set
+            {
+                _Value = value;
+            }
+        }
+        public virtual object OldValue
+        {
+            get
+            {
+                return _OldValue;
+            }
+        }
         public bool IsDirty
         {
             get
             {
-                if ((this.Value == null && this.OldValue != null) ||
-                    (this.Value != null && this.OldValue == null))
+                if ((_Value == null && _OldValue != null) ||
+                    (_Value != null && _OldValue == null))
                     return true;
-                else if (this.Value is MemoryStream && this.OldValue is MemoryStream)
+                else if (_Value is byte[] && _OldValue is byte[])
                 {
-                    var BytesA = ((MemoryStream)this.Value).GetBuffer();
-                    var BytesB = ((MemoryStream)this.OldValue).GetBuffer();
+                    var BytesA = (byte[])_Value;
+                    var BytesB = (byte[])_OldValue;
 
                     if (BytesA.LongLength != BytesB.LongLength)
                         return true;
@@ -39,23 +64,21 @@ namespace Common.Templates
 
         internal protected void SubmitValue()
         {
-            this.OldValue = GetCloneValue(this.Value);
+            _OldValue = GetCloneValue(_Value);
         }
         internal protected void RollbackToOldValue()
         {
-            this.Value = GetCloneValue(this.OldValue);
+            _Value = GetCloneValue(_OldValue);
         }
         internal protected void RollbackToInitValue()
         {
-            this.Value = GetCloneValue(this.InitValue);
+            _Value = GetCloneValue(_InitValue);
         }
 
         private static object GetCloneValue(object parValue)
         {
             if (parValue is ICloneable)
                 return ((ICloneable)parValue).Clone();
-            else if (parValue is MemoryStream)
-                return new MemoryStream(((MemoryStream)parValue).ToArray());
             else
                 return parValue;
         }
@@ -63,17 +86,17 @@ namespace Common.Templates
         public virtual void Dispose()
         {
             this.Name = null;
-            this.Value = null;
-            this.OldValue = null;
-            this.InitValue = null;
+            _Value = null;
+            _OldValue = null;
+            _InitValue = null;
         }
 
         public Field(string parName,object parInitValue)
         {
             this.Name = parName;
-            this.InitValue = parInitValue;
-            this.OldValue = parInitValue;
-            this.Value = parInitValue;
+            _InitValue = parInitValue;
+            _Value = parInitValue;
+            _OldValue = parInitValue;
         }
     }
 }

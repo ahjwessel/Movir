@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Common.Templates;
+using System.Text;
 
 namespace MSSQL
 {
@@ -14,36 +11,33 @@ namespace MSSQL
         {
             get
             {
-                string varIndexTypeStart = "CREATE ";
+                var BaseIndex = new StringBuilder();
+                BaseIndex.Append("CREATE ");
+
                 switch (this.IndexType)
                 {
                     case SQLIndexTypes.PrimaryKey:
                         throw new NotImplementedException();//Wordt gedaan dmv create field
-                    case SQLIndexTypes.NormalIndex:
-                    case SQLIndexTypes.FullText:
-                        varIndexTypeStart += "INDEX " + this.Name + " ";
-                        break;
                     case SQLIndexTypes.UniqueIndex:
-                        varIndexTypeStart += "UNIQUE INDEX " + this.Name + " ";
+                        BaseIndex.Append("UNIQUE INDEX ");
+                        break;
+                    default:
+                        BaseIndex.Append("INDEX ");
                         break;
                 }
-                System.Text.StringBuilder sbNames = new System.Text.StringBuilder();
-                string varToAdd = "";
+
+                BaseIndex.Append(this.Name);
+                BaseIndex.Append(" ");
+
+                StringBuilder Names = new StringBuilder();
                 foreach (string varName in this.FieldNames)
                 {
-                    if (varName.IndexOf("(") >= 0)
-                    {
-                        varToAdd = varName.Substring(0, varName.IndexOf("("));
-                        varToAdd = "" + varToAdd + "" + varName.Substring(varName.IndexOf("("));
-                    }
-                    else
-                        varToAdd = "" + varName + "";
-
-                    sbNames.Append("," + varToAdd);
+                    if (Names.Length > 0)
+                        Names.Append(",");
+                    Names.Append(varName);
                 }
-                string varTotal = varIndexTypeStart+ " ON " + this.Tablename + "(" + sbNames.ToString().Substring(1) + ") ";
 
-                return varTotal;
+                return BaseIndex.ToString() + " ON " + this.Tablename + "(" + Names.ToString() + ") ";
             }
         }
 

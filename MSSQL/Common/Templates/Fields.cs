@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Common.Templates
 {
@@ -68,6 +65,25 @@ namespace Common.Templates
                 }
 
                 return varReturnValue;
+            }
+        }
+
+        public object[] getValues()
+        {
+            var Values = new List<object>();
+            foreach (Field fld in this)
+            {
+                Values.Add(fld.Value);
+            }
+
+            if (Values.Count == 0)
+                return null;
+            else
+            {
+                var Return = new object[Values.Count];
+                Values.CopyTo(Return);
+                Values.Clear();
+                return Return;
             }
         }
 

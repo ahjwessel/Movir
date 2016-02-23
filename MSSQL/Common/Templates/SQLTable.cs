@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Collections.Generic;
 using Common.Templates;
 
 namespace MSSQL
@@ -24,11 +21,13 @@ namespace MSSQL
         {
             using (var tbl = (SQLTable)System.Activator.CreateInstance(parTableClass))
             {
+                if (parConnector.HasTable(tbl.Tablename))
+                    parConnector.DeleteTable(tbl.Tablename);
                 tbl.pCreateTable(parConnector, parIndexes);
             }
         }
-        protected static ArrayList getAll(SQLConnector parConnector,
-                                          Type parTableClass)
+        protected static List<SQLTable>  getAll(SQLConnector parConnector,
+                                                Type parTableClass)
         {
             string varSQL;
             using ( var tbl = (SQLTable)System.Activator.CreateInstance(parTableClass))
@@ -37,11 +36,11 @@ namespace MSSQL
             }
             return getAll(parConnector, parTableClass, varSQL);
         }
-        protected static ArrayList getAll(SQLConnector parConnector,
-                                          Type parTableClass,
-                                          string parSQL)
+        protected static List<SQLTable> getAll(SQLConnector parConnector,
+                                               Type parTableClass,
+                                               string parSQL)
         {
-            var arrReturn = new ArrayList();
+            var Tables = new List<SQLTable>();
             using (var rec = parConnector.OpenRecordset(parSQL))
             {
                 if (rec != null)
@@ -55,7 +54,7 @@ namespace MSSQL
                             tbl = (SQLTable)System.Activator.CreateInstance(parTableClass);
                             tbl.RecToTyp(rec);
 
-                            arrReturn.Add(tbl);
+                            Tables.Add(tbl);
                             rec.MoveNext();
                         }
                     }
@@ -63,10 +62,10 @@ namespace MSSQL
                 }
             }
 
-            return arrReturn;
+            return Tables;
         }
         private static SQLField getField(SQLRecordset parRecordset,
-                                params string[] parPossibleFieldnames)
+                                         params string[] parPossibleFieldnames)
         {
             SQLField fld = null;
             foreach (string varFieldname in parPossibleFieldnames)
@@ -118,14 +117,14 @@ namespace MSSQL
             {
                 if (rec == null)
                 {
-                    this.EmptyValues();
+                    this.RollbackToInitValues();
                     this.SetFlags(true, false);
                 }
                 else
                 {
                     if (rec.EOF)
                     {
-                        this.EmptyValues();
+                        this.RollbackToInitValues();
                         this.SetFlags(true, false);
                     }
                     else
@@ -151,11 +150,6 @@ namespace MSSQL
             this.CreateNew();
         }
         #endregion
-
-        public override void Dispose()
-        {
-            base.Dispose();
-        }
 
         public SQLTable(string parTablename, SQLFields parFields)
             :base(parTablename,parFields)

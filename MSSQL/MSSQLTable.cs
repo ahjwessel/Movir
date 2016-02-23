@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Common.Templates;
+﻿using Common.Templates;
 
 namespace MSSQL
 {
@@ -11,17 +6,16 @@ namespace MSSQL
     { 
         protected override void pCreateTable(SQLConnector parConnector, params SQLIndex[] parIndexes)
         {
-            if (parConnector.HasTable(this.Tablename))
-                parConnector.DeleteTable(this.Tablename);
-
             System.Text.StringBuilder sbFields = new System.Text.StringBuilder();
             foreach (MSSQLField fld in this.Fields)
             {
-                sbFields.Append("," + fld.CreateLine);
+                if (sbFields.Length > 0)
+                    sbFields.Append(",");
+                sbFields.Append(fld.CreateLine);
             }
 
             string sqlstr = "CREATE TABLE " + this.Tablename + " (" +
-                            sbFields.ToString().Substring(1) +
+                            sbFields.ToString() +
                             ") ";
             parConnector.Execute(sqlstr);
 

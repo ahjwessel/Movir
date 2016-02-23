@@ -60,7 +60,6 @@
     <Compile Include="MSSQLFields.cs" />
     <Compile Include="MSSQLTable.cs" />
     <Compile Include="MSSQLTextField.cs" />
-    <Compile Include="MSSQLTools.cs" />
     <Compile Include="Common\Templates\Field.cs" />
     <Compile Include="Common\Templates\Fields.cs" />
     <Compile Include="Form1.cs">

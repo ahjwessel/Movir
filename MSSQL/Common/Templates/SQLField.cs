@@ -1,43 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Data;
 
 namespace Common.Templates
 {
     public abstract class SQLField:Field
     {
         #region Properties
-        public int FieldIndex
-        {
-            get
-            {
-                return this.Fieldnumber - 1;
-            }
-        }
-        public int Fieldnumber { get; protected set; }
+        public int FieldIndex { get; protected set; }
 
         public string SQLValue
         {
             get
             {
-                return ConvertValueToSQL(this.Value);
+                return ConvertValueToSQL(base.Value);
             }
         }
         public string SQLOldValue
         {
             get
             {
-                return ConvertValueToSQL(this.OldValue);
+                return ConvertValueToSQL(base.OldValue);
             }
         }
         public string SQLInitValue
         {
             get
             {
-                return ConvertValueToSQL(this.InitValue);
+                return ConvertValueToSQL(base.InitValue);
             }
         }
         public bool IsPrimaryKey { get; protected set; }
@@ -52,7 +40,7 @@ namespace Common.Templates
         {
             try
             {
-                this.Value = this.ConvertSQLToValue(parRow[this.FieldIndex]);
+                base.Value = this.ConvertSQLToValue(parRow[this.FieldIndex]);
             }
             catch
             { }
@@ -71,14 +59,15 @@ namespace Common.Templates
             }
         }
 
-        public SQLField(int parFieldnumber, DataTable parSchemaTable)
-        : this(parSchemaTable.Rows[parFieldnumber - 1]["ColumnName"].ToString(), null,
-               getBool(parSchemaTable.Rows[parFieldnumber - 1]["IsKey"]),
-               getBool(parSchemaTable.Rows[parFieldnumber - 1]["IsAutoIncrement"]),
-               getBool(parSchemaTable.Rows[parFieldnumber - 1]["AllowDBNull"]))
+        public SQLField(int parFieldIndex, DataTable parSchemaTable)
+        : this(parSchemaTable.Rows[parFieldIndex]["ColumnName"].ToString(), null,
+               getBool(parSchemaTable.Rows[parFieldIndex]["IsKey"]),
+               getBool(parSchemaTable.Rows[parFieldIndex]["IsAutoIncrement"]),
+               getBool(parSchemaTable.Rows[parFieldIndex]["AllowDBNull"]))
         {
-            this.Fieldnumber = parFieldnumber;
+            this.FieldIndex = parFieldIndex;
             this.Value = null;
+            this.SubmitValue();
         }
         public SQLField(string parName, object parInitValue, bool parIsPrimaryKey, bool parIsAutonumber, bool parAllowDBNull)
             : base(parName, parInitValue)

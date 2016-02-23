@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections;
+using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Common.Templates
 {
@@ -37,10 +35,11 @@ namespace Common.Templates
                 {
                     if (sbFields.Length > 0)
                         sbFields.Append(",");
-                    sbFields.Append(fld.Name);
 
                     if (sbValues.Length > 0)
                         sbValues.Append(",");
+
+                    sbFields.Append(fld.Name);
                     sbValues.Append(fld.SQLValue);
                 }
             }
@@ -61,7 +60,8 @@ namespace Common.Templates
                     if (sbChangedFields.Length > 0)
                         sbChangedFields.Append(",");
 
-                    sbChangedFields.Append(fld.Name + "=");
+                    sbChangedFields.Append(fld.Name);
+                    sbChangedFields.Append("=");
                     sbChangedFields.Append(fld.SQLValue);
                 }
             }
@@ -70,7 +70,7 @@ namespace Common.Templates
             {
                 var PrimaryKeysWhere = this.getPrimaryKeyWhere(parPrimaryKeys);
                 if (PrimaryKeysWhere!=null)
-                    return "UPDATE "+parTabel+ "SET " + sbChangedFields.ToString() + " WHERE " + PrimaryKeysWhere;
+                    return "UPDATE "+parTabel+ " SET " + sbChangedFields.ToString() + " WHERE " + PrimaryKeysWhere;
             }
 
             return "";
@@ -92,19 +92,20 @@ namespace Common.Templates
         #region getPrimaryKeys
         public string[] getPrimaryKeys()
         {
-            var arrFieldsnames = new ArrayList();
+            var Fieldsnames = new List<string>();
             foreach (SQLField fld in this)
             {
                 if (fld.IsPrimaryKey)
-                    arrFieldsnames.Add(fld.Name);
+                    Fieldsnames.Add(fld.Name);
             }
 
-            if (arrFieldsnames.Count == 0)
+            if (Fieldsnames.Count == 0)
                 return null;
             else
             {
-                var mtxFieldsnames = new string[arrFieldsnames.Count];
-                arrFieldsnames.CopyTo(mtxFieldsnames);
+                var mtxFieldsnames = new string[Fieldsnames.Count];
+                Fieldsnames.CopyTo(mtxFieldsnames);
+                Fieldsnames.Clear();
                 return mtxFieldsnames;
             }
         }
@@ -118,9 +119,8 @@ namespace Common.Templates
                 if (fld!=null)
                 {
                     if (sbWhere.Length > 0)
-                    {
                         sbWhere.Append(" AND ");
-                    }
+
                     sbWhere.Append(fld.Name + "=" + fld.SQLValue);
                 }
             }

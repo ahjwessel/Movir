@@ -28,19 +28,18 @@ namespace MSSQL
             
             using (var tbl = new tblTesters())
             {
-                var mem = new System.IO.MemoryStream();
-                pic.Image.Save(mem, System.Drawing.Imaging.ImageFormat.Jpeg);
-
                 tblTesters.CreateTable(sql);
                 tbl.Naam = "blablablabla";
                 tbl.Fields["nummer"].Value = DateTime.Now.Minute;
                 tbl.Fields["Decimal"].Value = 4.5;
                 tbl.Fields["Binary"].Value = new System.IO.MemoryStream(System.Text.Encoding.Default.GetBytes("test"));
-                tbl.Fields["Image"].Value = mem;
+                tbl.Fields["Image"].Value = pic.Image;
                 tbl.Save(sql);
 
                 tbl.TestRead(sql);
-                pic.Image = new Bitmap((System.IO.MemoryStream)tbl.Fields["Image"].Value);
+                //pic.Image = new Bitmap(new System.IO.MemoryStream((byte[])tbl.Fields["Image"].Value));
+                tbl.Fields["Binary"].Value = new System.IO.MemoryStream(System.Text.Encoding.Default.GetBytes("blabla"));
+                tbl.Save(sql);
             }
 
             return;

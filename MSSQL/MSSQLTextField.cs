@@ -1,26 +1,55 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Data;
 
 namespace MSSQL
 {
     public class MSSQLTextField:MSSQLField
     {
         public short MaxLength { get; protected set; }
+        public override object InitValue
+        {
+            get
+            {
+                return (string)base.InitValue;
+            }
+        }
+        public override object Value
+        {
+            get
+            {
+                return (string)base.Value;
+            }
+            set
+            {
+                base.Value = (string)value;
+            }
+        }
+        public override object OldValue
+        {
+            get
+            {
+                return (string)base.OldValue;
+            }
+        }
         public override string CreateLine
         {
             get
             {
-                return this.Name + " " + this.Type.ToString() + "(" + this.MaxLength + ") ";
+                return this.Name + " " + 
+                       this.Type.ToString() + 
+                       "(" + (this.MaxLength==0 ? "max" : this.MaxLength.ToString())  + ") ";
             } 
         }
-        public MSSQLTextField(string parName,short parMaxLength,string parInitValue)
-            :base(parName,SqlDbType.VarChar,parInitValue, false,false,true)
+        public MSSQLTextField(string parName,short parMaxLength,bool parUnicode,string parInitValue)
+            :base(parName,(parUnicode ? SqlDbType.NVarChar : SqlDbType.VarChar), parInitValue, false,false,true)
         {
-            this.MaxLength = parMaxLength;
+            if (parMaxLength < 0)
+                this.MaxLength = 0;
+            else if (parUnicode && parMaxLength > 4000)
+                this.MaxLength = 0;//Gelijk aan max
+            else if (!parUnicode && parMaxLength > 8000)
+                this.MaxLength = 0;//Gelijk aan max
+            else
+                this.MaxLength = parMaxLength;
         }
     }
 }

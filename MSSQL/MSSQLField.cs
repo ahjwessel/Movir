@@ -12,15 +12,10 @@ namespace MSSQL
         {
             get
             {
-                var varName = this.Name;
-                var varType = this.Type.ToString();
-                var varPrimary = this.IsPrimaryKey ? "PRIMARY KEY " : "";
-
-                var varIsNull = "";
-                if (!this.AllowDBNull)
-                    varIsNull = " NOT NULL";
-
-                return varName + " " + varType + " "+ varPrimary + varIsNull;
+                return this.Name + " " + 
+                       this.Type.ToString() + " "+ 
+                       (this.IsPrimaryKey ? "PRIMARY KEY " : "") + 
+                       (this.AllowDBNull ? "" : "NOT NULL");
             }
         }
 
@@ -45,10 +40,10 @@ namespace MSSQL
         {
             this.Type = parType;
         }
-        public MSSQLField(int parFieldnumber, DataTable parSchemaTable)
-            :base(parFieldnumber,parSchemaTable)
+        public MSSQLField(int parFieldIndex, DataTable parSchemaTable)
+            :base(parFieldIndex,parSchemaTable)
         {
-            this.Type = (SqlDbType)Enum.Parse(typeof(SqlDbType), parSchemaTable.Rows[parFieldnumber - 1]["ProviderType"].ToString());
+            this.Type = (SqlDbType)Enum.Parse(typeof(SqlDbType), parSchemaTable.Rows[parFieldIndex]["ProviderType"].ToString());
         }
     }
 }
