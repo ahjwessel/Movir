@@ -21,10 +21,10 @@ namespace MSSQL
                         throw new NotImplementedException();//Wordt gedaan dmv create field
                     case SQLIndexTypes.NormalIndex:
                     case SQLIndexTypes.FullText:
-                        varIndexTypeStart = "INDEX " + this.Name + " ";
+                        varIndexTypeStart += "INDEX " + this.Name + " ";
                         break;
                     case SQLIndexTypes.UniqueIndex:
-                        varIndexTypeStart = "UNIQUE INDEX " + this.Name + " ";
+                        varIndexTypeStart += "UNIQUE INDEX " + this.Name + " ";
                         break;
                 }
                 System.Text.StringBuilder sbNames = new System.Text.StringBuilder();
@@ -41,8 +41,7 @@ namespace MSSQL
 
                     sbNames.Append("," + varToAdd);
                 }
-                string varTotal = varIndexTypeStart;
-                varTotal += "ON "+this.Tablename+ " (" + sbNames.ToString().Substring(1) + ")";
+                string varTotal = varIndexTypeStart+ " ON " + this.Tablename + "(" + sbNames.ToString().Substring(1) + ") ";
 
                 return varTotal;
             }

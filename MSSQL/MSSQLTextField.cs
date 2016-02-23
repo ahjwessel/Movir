@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,11 +14,13 @@ namespace MSSQL
         {
             get
             {
-                return this.Name + " " + this.Type.ToString() + "(" + this.MaxLength + ")" + "DEFAULT \"" + this.SQLInitValue + "\"";
+                return this.Name + " " + this.Type.ToString() + "(" + this.MaxLength + ") ";
             } 
         }
-        public MSSQLTextField(string parName,short parMaxLength,bool parUnicode,string parInitValue)
-            :base(parName,parUnicode ? MSSQLFieldTypes.NText : MSSQLFieldTypes.Text,true,parInitValue)
-        { }
+        public MSSQLTextField(string parName,short parMaxLength,string parInitValue)
+            :base(parName,SqlDbType.VarChar,parInitValue, false,false,true)
+        {
+            this.MaxLength = parMaxLength;
+        }
     }
 }

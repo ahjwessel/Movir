@@ -35,12 +35,8 @@ namespace MSSQL
                 }
             }
         }
-        public MSSQLTable(string parTablename, string parPrimaryKey, params MSSQLField[] parFields)
-            :this(parTablename,new string[] { parPrimaryKey },parFields)
+        public MSSQLTable(string parTablename, params MSSQLField[] parFields)
+            : base(parTablename,new MSSQLFields(parFields))
         { }
-        public MSSQLTable(string parTablename, string[] parPrimaryKeys, params MSSQLField[] parFields)
-            : base(parTablename,parPrimaryKeys, new MSSQLFields(parFields))
-        {
-        }
     }
 }

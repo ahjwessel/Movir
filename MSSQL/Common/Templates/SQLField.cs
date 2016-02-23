@@ -50,7 +50,13 @@ namespace Common.Templates
 
         public void Refresh(DataRow parRow)
         {
-            this.Value = this.ConvertSQLToValue(parRow[this.FieldIndex]);
+            try
+            {
+                this.Value = this.ConvertSQLToValue(parRow[this.FieldIndex]);
+            }
+            catch
+            { }
+            
             this.SubmitValue();
         }
         private static bool getBool(object parValue)
@@ -65,20 +71,21 @@ namespace Common.Templates
             }
         }
 
-        public SQLField(string parName, bool parAllowDBNull, object parInitValue)
-            :base(parName,parInitValue)
-        {
-            this.AllowDBNull = parAllowDBNull;
-        }
         public SQLField(int parFieldnumber, DataTable parSchemaTable)
-        : base(parSchemaTable.Rows[parFieldnumber - 1]["ColumnName"].ToString(), null)
+        : this(parSchemaTable.Rows[parFieldnumber - 1]["ColumnName"].ToString(), null,
+               getBool(parSchemaTable.Rows[parFieldnumber - 1]["IsKey"]),
+               getBool(parSchemaTable.Rows[parFieldnumber - 1]["IsAutoIncrement"]),
+               getBool(parSchemaTable.Rows[parFieldnumber - 1]["AllowDBNull"]))
         {
             this.Fieldnumber = parFieldnumber;
             this.Value = null;
-
-            this.IsPrimaryKey = getBool(parSchemaTable.Rows[parFieldnumber - 1]["IsKey"]);
-            this.IsAutonumber = getBool(parSchemaTable.Rows[parFieldnumber - 1]["IsAutoIncrement"]);
-            this.AllowDBNull = getBool(parSchemaTable.Rows[parFieldnumber - 1]["AllowDBNull"]);
+        }
+        public SQLField(string parName, object parInitValue, bool parIsPrimaryKey, bool parIsAutonumber, bool parAllowDBNull)
+            : base(parName, parInitValue)
+        {
+            this.IsPrimaryKey = parIsPrimaryKey;
+            this.IsAutonumber = parIsAutonumber;
+            this.AllowDBNull = parAllowDBNull;
         }
     }
 }

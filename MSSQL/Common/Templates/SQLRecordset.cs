@@ -71,7 +71,7 @@ namespace Common.Templates
             Exception exThrow = null;
             var cmd = this.Connection.CreateCommand(this.SQL);
             cmd.CommandTimeout = this.Connection.TimeoutOpenRecordsetInSeconden;
-            DbDataReader rdr = cmd.ExecuteReader();
+            DbDataReader rdr = cmd.ExecuteReader(CommandBehavior.KeyInfo);
             try
             {
                 this.SchemaTable = rdr.GetSchemaTable();
@@ -195,12 +195,12 @@ namespace Common.Templates
             switch (this.State)
             {
                 case RecordsetStates.Appending:
-                    varSQL = this.getInsertString();
+                    varSQL = this.Fields.getInsertString(this.Tablename);
                     if (varSQL != "")
                         varExecuted = this.Connection.Execute(varSQL);
                     break;
                 case RecordsetStates.Editing:
-                    varSQL = this.getUpdateString();
+                    varSQL = this.Fields.getUpdateString(this.Tablename);
                     if (varSQL != "")
                         varExecuted = this.Connection.Execute(varSQL);
                     break;
@@ -214,7 +214,7 @@ namespace Common.Templates
         }
         public void Delete()
         {
-            if (this.Connection.Execute(this.getDeleteString()) > int.MinValue)
+            if (this.Connection.Execute(this.Fields.getDeleteString(this.Tablename)) > int.MinValue)
             {
                 this.State = RecordsetStates.Viewing;
 
@@ -263,7 +263,7 @@ namespace Common.Templates
                     mtxFieldValues = new object[this.Fields.Count];
                     for (int varFieldcounter = 0; varFieldcounter < this.Fields.Count; varFieldcounter++)
                     {
-                        mtxFieldValues[varFieldcounter] = this.Fields[varFieldcounter + 1].Value;
+                        mtxFieldValues[varFieldcounter] = this.Fields[varFieldcounter ].Value;
                     }
                     arrValues.Add(mtxFieldValues);
                 }
@@ -285,44 +285,6 @@ namespace Common.Templates
             arrValues.Clear();
 
             return mtxValues;
-        }
-        #endregion
-
-        #region getAddString/getUpdateString/getDeleteString
-        internal virtual string getInsertString()
-        {
-            string varSelectedDatabasePart = this.Connection.SelectedDatabase;
-            if (varSelectedDatabasePart != "")
-                varSelectedDatabasePart = varSelectedDatabasePart + ".";
-
-            return "INSERT " + " INTO " + varSelectedDatabasePart + this.Tablename + " " + this.Fields.getInsertString();
-        }
-        internal string getUpdateString()
-        {
-            string varUpdateString = this.Fields.getUpdateString();
-            if (varUpdateString == "")
-                return "";
-            else
-            {
-                string varSelectedDatabasePart = this.Connection.SelectedDatabase;
-                if (varSelectedDatabasePart != "")
-                    varSelectedDatabasePart = varSelectedDatabasePart + ".";
-
-                return "UPDATE " + varSelectedDatabasePart + this.Tablename + varUpdateString;
-            }
-        }
-        internal virtual string getDeleteString()
-        {
-            if (this.CurrentRecord == null)
-                return "";
-            else
-            {
-                string varSelectedDatabasePart = this.Connection.SelectedDatabase;
-                if (varSelectedDatabasePart != "")
-                    varSelectedDatabasePart = varSelectedDatabasePart + ".";
-
-                return "DELETE * FROM " + varSelectedDatabasePart + this.Tablename + " WHERE " + this.Fields.getPrimaryKeyWhere();
-            }
         }
         #endregion
 

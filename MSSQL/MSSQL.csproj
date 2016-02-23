@@ -49,7 +49,9 @@
     <Compile Include="Common\Templates\SQLIndex.cs" />
     <Compile Include="Common\Templates\SQLTable.cs" />
     <Compile Include="MSSQLAutonumberField.cs" />
+    <Compile Include="MSSQLBinaryField.cs" />
     <Compile Include="MSSQLConnector.cs" />
+    <Compile Include="MSSQLImageField.cs" />
     <Compile Include="MSSQLIndex.cs" />
     <Compile Include="MSSQLRecord.cs" />
     <Compile Include="MSSQLRecordset.cs" />
@@ -74,6 +76,7 @@
     <Compile Include="Common\Templates\SQLRecord.cs" />
     <Compile Include="Common\Templates\SQLRecordset.cs" />
     <Compile Include="Common\Templates\Table.cs" />
+    <Compile Include="tblTesters.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>

@@ -6,7 +6,7 @@ namespace MSSQL
 {
     public class MSSQLField:SQLField
     {
-        public MSSQLFieldTypes Type { get; protected set; }
+        public SqlDbType Type { get; protected set; }
 
         public override string CreateLine
         {
@@ -20,9 +20,7 @@ namespace MSSQL
                 if (!this.AllowDBNull)
                     varIsNull = " NOT NULL";
 
-                var varDefaultValue = " DEFAULT " + this.SQLInitValue;
-
-                return varName + " " + varType + varPrimary + varIsNull + varDefaultValue;
+                return varName + " " + varType + " "+ varPrimary + varIsNull;
             }
         }
 
@@ -36,15 +34,21 @@ namespace MSSQL
             return MSSQLConnector.ConvertSQLToValue(this.Type, parSQLValue);
         }
 
-        public MSSQLField(string parName, MSSQLFieldTypes parType,bool parAllowDBNull, object parInitValue)
-            :base(parName,parAllowDBNull,parInitValue)
+        public MSSQLField(string parName, SqlDbType parType, object parInitValue)
+            : this(parName, parType, parInitValue, false)
+        { }
+        public MSSQLField(string parName, SqlDbType parType, object parInitValue, bool parIsPrimaryKey)
+            :this(parName,parType,parInitValue,parIsPrimaryKey,false,true)
+        { }
+        public MSSQLField(string parName, SqlDbType parType,object parInitValue,bool parIsPrimaryKey,bool parIsAutonumber, bool parAllowDBNull)
+            :base(parName,parInitValue,parIsPrimaryKey,parIsAutonumber,parAllowDBNull)
         {
             this.Type = parType;
         }
         public MSSQLField(int parFieldnumber, DataTable parSchemaTable)
             :base(parFieldnumber,parSchemaTable)
         {
-            this.Type = (MSSQLFieldTypes)Enum.Parse(typeof(MSSQLFieldTypes), parSchemaTable.Rows[parFieldnumber - 1]["ProviderType"].ToString());
+            this.Type = (SqlDbType)Enum.Parse(typeof(SqlDbType), parSchemaTable.Rows[parFieldnumber - 1]["ProviderType"].ToString());
         }
     }
 }

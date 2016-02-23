@@ -16,7 +16,7 @@ namespace Common.Templates
         public int CurrentPort { get; private set; }
         public string CurrentUsername { get; private set; }
         public string CurrentPassword { get; private set; }
-        public string SelectedDatabase { get; private set; }
+        public string SelectedDatabase { get; protected set; }
         
         public Exception LastException{get; protected set;}
         public int TimeoutOpenRecordsetInSeconden { get; set; }
@@ -123,6 +123,9 @@ namespace Common.Templates
         public abstract void DeleteTable(string parTablename);
         public int Execute(string parSQL)
         {
+            if (parSQL == "")
+                return int.MinValue;
+
             int varReturn = int.MinValue;
             try
             {

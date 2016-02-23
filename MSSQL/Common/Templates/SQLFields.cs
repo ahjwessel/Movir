@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections;
 using System.Data;
 using System.Linq;
 using System.Text;
@@ -24,8 +24,8 @@ namespace Common.Templates
             }
         }
 
-        #region getAddString/getUpdateString/getFieldsString/getValuesString
-        internal protected string getInsertString()
+        #region getInsertString/getUpdateString/getDeleteString
+        internal protected virtual string getInsertString(string parTabel)
         {
             StringBuilder sbFields = new StringBuilder();
             StringBuilder sbValues = new StringBuilder();
@@ -41,43 +41,81 @@ namespace Common.Templates
 
                     if (sbValues.Length > 0)
                         sbValues.Append(",");
-                      sbValues.Append(fld.SQLValue);
+                    sbValues.Append(fld.SQLValue);
                 }
             }
 
-            return "(" + sbFields.ToString() + ") VALUES (" + sbValues.ToString() + ")";
+            return "INSERT INTO " + parTabel + " (" + sbFields.ToString() + ") VALUES (" + sbValues.ToString() + ")";
         }
-        internal string getUpdateString()
+        internal protected virtual string getUpdateString(string parTabel)
         {
-            StringBuilder sbString = new StringBuilder();
+            return getUpdateString(parTabel, this.getPrimaryKeys());
+        }
+        internal protected virtual string getUpdateString(string parTabel,string[] parPrimaryKeys)
+        {
+            var sbChangedFields = new StringBuilder();
             foreach (SQLField fld in this)
             {
                 if (fld.IsDirty)
                 {
-                    if (sbString.Length > 0)
-                    {
-                        sbString.Append(",");
-                    }
+                    if (sbChangedFields.Length > 0)
+                        sbChangedFields.Append(",");
 
-                    sbString.Append(fld.Name + "=");
-                    sbString.Append(fld.SQLValue);
+                    sbChangedFields.Append(fld.Name + "=");
+                    sbChangedFields.Append(fld.SQLValue);
                 }
             }
 
-            if (sbString.Length > 0)
-                return "SET " + sbString.ToString() + " WHERE " + this.getPrimaryKeyWhere();
-            else
+            if (sbChangedFields.Length > 0)
+            {
+                var PrimaryKeysWhere = this.getPrimaryKeyWhere(parPrimaryKeys);
+                if (PrimaryKeysWhere!=null)
+                    return "UPDATE "+parTabel+ "SET " + sbChangedFields.ToString() + " WHERE " + PrimaryKeysWhere;
+            }
+
+            return "";
+        }
+        internal protected virtual string getDeleteString(string parTablename)
+        {
+            return getDeleteString(parTablename, this.getPrimaryKeys());
+        }
+        internal protected virtual string getDeleteString(string parTablename,string[] parPrimaryKeys)
+        {
+            var PrimaryKeysWhere = this.getPrimaryKeyWhere(parPrimaryKeys);
+            if (PrimaryKeysWhere == null)
                 return "";
+            else
+                return "DELETE * FROM " + parTablename + "WHERE " + PrimaryKeysWhere;
         }
         #endregion
 
-        #region getPrimaryKeyWhere
-        internal string getPrimaryKeyWhere()
+        #region getPrimaryKeys
+        public string[] getPrimaryKeys()
         {
-            StringBuilder sbWhere = new StringBuilder();
+            var arrFieldsnames = new ArrayList();
             foreach (SQLField fld in this)
             {
                 if (fld.IsPrimaryKey)
+                    arrFieldsnames.Add(fld.Name);
+            }
+
+            if (arrFieldsnames.Count == 0)
+                return null;
+            else
+            {
+                var mtxFieldsnames = new string[arrFieldsnames.Count];
+                arrFieldsnames.CopyTo(mtxFieldsnames);
+                return mtxFieldsnames;
+            }
+        }
+        public string getPrimaryKeyWhere(params string[] parPrimaryKeys)
+        {
+            StringBuilder sbWhere = new StringBuilder();
+            SQLField fld;
+            foreach (var Fieldname in parPrimaryKeys)
+            {
+                fld = this[Fieldname];
+                if (fld!=null)
                 {
                     if (sbWhere.Length > 0)
                     {

@@ -9,7 +9,6 @@ namespace MSSQL
 {
     public abstract class SQLTable:Table
     {
-        protected string[] PrimaryKeys { get; private set; }
         new public SQLFields Fields
         {
             get
@@ -113,21 +112,6 @@ namespace MSSQL
         {
             return "SELECT * FROM " + this.Tablename + " ";
         }
-        protected virtual string getPrimaryKeyWhere()
-        {
-            var ReturnValue = new StringBuilder();
-            SQLField Field;
-            foreach (var PrimaryKeyName in this.PrimaryKeys)
-            {
-                if (ReturnValue.Length > 0)
-                    ReturnValue.Append(" AND ");
-
-                Field = this.Fields[PrimaryKeyName];
-                ReturnValue.Append(Field.Name + "=" + Field.SQLOldValue);
-            }
-
-            return ReturnValue.ToString();
-        }
         protected virtual void pRead(SQLConnector parConnector, string parSQL)
         {
             using (var rec = parConnector.OpenRecordset(parSQL))
@@ -153,78 +137,28 @@ namespace MSSQL
                 }
             }
         }
-        protected virtual void pSave(SQLConnector parConnector,
-                                     string parNewSQL,
-                                     string parExistingSQL)
+        public virtual void Save(SQLConnector parConnector)
         {
             if (this.IsNew)
-            {
-                using (var rec = parConnector.OpenRecordset(parNewSQL))
-                {
-                    if (rec != null)
-                    {
-                        rec.AddNew();
-                        TypToRec(rec);
-                        rec.Update();
-
-                        this.SetFlags(false, true);
-                    }
-                }
-            }
+                parConnector.Execute(this.Fields.getInsertString(this.Tablename));
             else
-            {
-                using (var rec = parConnector.OpenRecordset(parExistingSQL))
-                {
-                    if (rec != null)
-                    {
-                        if (rec.EOF)
-                        {
-                            this.SetFlags(true, true);
-                            this.pSave(parConnector, parNewSQL, parExistingSQL);
-                            return;
-                        }
-                        else
-                        {
-                            rec.Edit();
-                            TypToRec(rec);
-                            rec.Update();
-
-                            this.SetFlags(false, true);
-                        }
-                    }
-                }
-            }
+                parConnector.Execute(this.Fields.getUpdateString(this.Tablename));
+            this.SetFlags(false, true);
         }
-        protected virtual void pDelete(SQLConnector parConnection, string parSQL)
+        public virtual void Delete(SQLConnector parConnector)
         {
-            using (var rec = parConnection.OpenRecordset(parSQL))
-            {
-                if (rec != null)
-                {
-                    if (!rec.EOF)
-                    {
-                        rec.MoveFirst();
-                        rec.Delete();
-                    }
-                    this.CreateNew();
-                }
-            }
+            parConnector.Execute(this.Fields.getDeleteString(this.Tablename));
+            this.CreateNew();
         }
         #endregion
 
         public override void Dispose()
         {
-            this.PrimaryKeys = null;
             base.Dispose();
         }
 
-        public SQLTable(string parTablename, string parPrimaryKey, SQLFields parFields)
-            :this(parTablename,new string[] { parPrimaryKey },parFields)
+        public SQLTable(string parTablename, SQLFields parFields)
+            :base(parTablename,parFields)
         { }
-        public SQLTable(string parTablename, string[] parPrimaryKeys, SQLFields parFields)
-            : base(parTablename, parFields)
-        {
-            this.PrimaryKeys = parPrimaryKeys;
-        }
     }
 }

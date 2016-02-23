@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,12 +13,12 @@ namespace MSSQL
         {
             get
             {
-                return this.Name + " " + this.Type.ToString()+ " AUTO_INCREMENT";
+                return this.Name + " " + this.Type.ToString()+ " IDENTITY(1,1) " + (this.IsPrimaryKey ? "PRIMARY KEY " : "");
             }
         }
 
         public MSSQLAutonumberField(string parName)
-            :base(parName,MSSQLFieldTypes.Integer,false,0)
+            :base(parName,SqlDbType.Int,0,true,true,false)
         { }
     }
 }
