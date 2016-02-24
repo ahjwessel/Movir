@@ -53,11 +53,11 @@ namespace MSSQL
                        (this.AllowDBNull ? "" : "NOT NULL") ;
             }
         }
-        public MSSQLBinaryField(string parName)
-            : this(parName, SqlDbType.VarBinary)
+        public MSSQLBinaryField(string name)
+            : this(name, SqlDbType.VarBinary)
         { }
-        protected MSSQLBinaryField(string parName, SqlDbType parType)
-            : base(parName, parType, null)
+        protected MSSQLBinaryField(string name, SqlDbType SQLType)
+            : base(name, SQLType, null)
         { }
     }
 }

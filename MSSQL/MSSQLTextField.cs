@@ -39,8 +39,8 @@ namespace MSSQL
                        "(" + (this.MaxLength==0 ? "max" : this.MaxLength.ToString())  + ") ";
             } 
         }
-        public MSSQLTextField(string parName,short parMaxLength,bool parUnicode,string parInitValue)
-            :base(parName,(parUnicode ? SqlDbType.NVarChar : SqlDbType.VarChar), parInitValue, false,false,true)
+        public MSSQLTextField(string name,short parMaxLength,bool parUnicode,string InitValue)
+            :base(name,(parUnicode ? SqlDbType.NVarChar : SqlDbType.VarChar), InitValue, false,false,true)
         {
             if (parMaxLength < 0)
                 this.MaxLength = 0;

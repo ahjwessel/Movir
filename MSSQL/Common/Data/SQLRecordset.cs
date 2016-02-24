@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 
-namespace Common.Templates
+namespace Common.Data
 {
     public enum RecordsetStates : byte
     {
@@ -56,25 +56,25 @@ namespace Common.Templates
         }
 
         #region OpenRecordset/CloseRecordset
-        protected internal bool OpenRecordset(string parSQL)
+        protected internal bool OpenRecordset(string SQL)
         {
-            this.SQL = parSQL;
+            this.SQL = SQL;
             return this.Requery();
         }
         public bool Requery()
         {
             this.CloseRecordset(false);
 
-            Exception exThrow = null;
-            var cmd = this.Connection.CreateCommand(this.SQL);
-            cmd.CommandTimeout = this.Connection.TimeoutOpenRecordsetInSeconden;
-            DbDataReader rdr = cmd.ExecuteReader(CommandBehavior.KeyInfo);
+            Exception exception = null;
+            var command = this.Connection.CreateCommand(this.SQL);
+            command.CommandTimeout = this.Connection.TimeoutOpenRecordsetInSeconden;
+            DbDataReader reader = command.ExecuteReader(CommandBehavior.KeyInfo);
             try
             {
-                this.SchemaTable = rdr.GetSchemaTable();
+                this.SchemaTable = reader.GetSchemaTable();
                 this.DataSet = new DataSet();
                 this.DataSet.EnforceConstraints = false;
-                this.DataSet.Load(rdr, LoadOption.OverwriteChanges, "tbl");
+                this.DataSet.Load(reader, LoadOption.OverwriteChanges, "tbl");
                 this.RecordCount = this.DataSet.Tables[0].Rows.Count;
                 this.Tablename = this.SchemaTable.Rows[0]["BaseTableName"].ToString();
                 this.CurrentRecord = this.CreateRecord(this.SchemaTable, this.DataSet);
@@ -83,15 +83,15 @@ namespace Common.Templates
             }
             catch (Exception ex)
             {
-                exThrow = ex;
+                exception = ex;
             }
 
-            rdr.Close();
-            rdr.Dispose();
-            cmd.Dispose();
+            reader.Close();
+            reader.Dispose();
+            command.Dispose();
 
-            if (exThrow != null)
-                throw exThrow;
+            if (exception != null)
+                throw exception;
 
             return true;
         }
@@ -99,7 +99,7 @@ namespace Common.Templates
         {
             this.CloseRecordset(true);
         }
-        private void CloseRecordset(bool parResetSQL)
+        private void CloseRecordset(bool resetSQL)
         {
             if (this.SchemaTable != null)
             {
@@ -118,10 +118,10 @@ namespace Common.Templates
             this.DisposeCurrentRecord();
             this.RecordsDeleted.Clear();
 
-            if (parResetSQL)
+            if (resetSQL)
                 this.SQL = "";
         }
-        protected abstract SQLRecord CreateRecord(DataTable parSchemaTable, DataSet parDataSet);
+        protected abstract SQLRecord CreateRecord(DataTable schemaTable, DataSet dataSet);
         #endregion
 
         private void ReadCurrentRecord()
@@ -138,9 +138,9 @@ namespace Common.Templates
         }
 
         #region Move... voids
-        public void MoveToRecord(int parRecordnumber)
+        public void MoveToRecord(int recordnumber)
         {
-            this.CurrentRecordNumber = parRecordnumber;
+            this.CurrentRecordNumber = recordnumber;
             this.ReadCurrentRecord();
         }
         public void MovePrevious()
@@ -185,19 +185,14 @@ namespace Common.Templates
         }
         public void Update()
         {
-            string varSQL = null;
             int varExecuted = -1;
             switch (this.State)
             {
                 case RecordsetStates.Appending:
-                    varSQL = this.Fields.getInsertString(this.Tablename);
-                    if (varSQL != "")
-                        varExecuted = this.Connection.Execute(varSQL);
+                    varExecuted = this.Connection.Execute(this.Fields.GetInsertString(this.Tablename));
                     break;
                 case RecordsetStates.Editing:
-                    varSQL = this.Fields.getUpdateString(this.Tablename);
-                    if (varSQL != "")
-                        varExecuted = this.Connection.Execute(varSQL);
+                    varExecuted = this.Connection.Execute(this.Fields.GetUpdateString(this.Tablename));
                     break;
             }
 
@@ -209,7 +204,7 @@ namespace Common.Templates
         }
         public void Delete()
         {
-            if (this.Connection.Execute(this.Fields.getDeleteString(this.Tablename)) > int.MinValue)
+            if (this.Connection.Execute(this.Fields.GetDeleteString(this.Tablename)) > int.MinValue)
             {
                 this.State = RecordsetStates.Viewing;
 
@@ -224,35 +219,35 @@ namespace Common.Templates
         }
         #endregion
 
-        #region getRows
-        public object[,] getRows()
+        #region GetRows
+        public object[,] GetRows()
         {
-            return this.getRows(this.RecordCount);
+            return this.GetRows(this.RecordCount);
         }
-        public object[,] getRows(int parNumberOfRecords)
+        public object[,] GetRows(int numberOfRecords)
         {
-            return this.getRows(parNumberOfRecords, 0);
+            return this.GetRows(numberOfRecords, 0);
         }
-        public object[,] getRows(int parNumberOfRecords, int parStartFrom)
+        public object[,] GetRows(int numberOfRecords, int startFrom)
         {
-            if (parStartFrom > 0)
-                this.CurrentRecordNumber = parStartFrom;
+            if (startFrom > 0)
+                this.CurrentRecordNumber = startFrom;
 
-            if (parNumberOfRecords > this.RecordCount + this.AbsolutePosition)
-                parNumberOfRecords = this.RecordCount + this.AbsolutePosition;
+            if (numberOfRecords > this.RecordCount + this.AbsolutePosition)
+                numberOfRecords = this.RecordCount + this.AbsolutePosition;
 
-            if (parNumberOfRecords <= 0)
+            if (numberOfRecords <= 0)
                 return null;
 
             var AllValues = new List<object[]>();
             object[] FieldValues = null;
-            for (int varRecordcounter = 1; varRecordcounter <= parNumberOfRecords; varRecordcounter++)
+            for (int varRecordcounter = 1; varRecordcounter <= numberOfRecords; varRecordcounter++)
             {
-                this.CurrentRecordNumber = varRecordcounter + parStartFrom;
+                this.CurrentRecordNumber = varRecordcounter + startFrom;
                 if (!this.RecordsDeleted.Contains(this.CurrentRecordNumber))
                 {
                     this.ReadCurrentRecord();
-                    FieldValues = this.Fields.getValues();
+                    FieldValues = this.Fields.GetValues();
                     AllValues.Add(FieldValues);
                 }
             }
@@ -289,7 +284,6 @@ namespace Common.Templates
             catch
             { }
             this.State = RecordsetStates.Viewing;
-            GC.SuppressFinalize(this);
         }
         private void DisposeCurrentRecord()
         {

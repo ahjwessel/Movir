@@ -12,8 +12,8 @@ namespace MSSQL
             }
         }
 
-        public MSSQLAutonumberField(string parName)
-            :base(parName,SqlDbType.Int,0,true,true,false)
+        public MSSQLAutonumberField(string name)
+            :base(name,SqlDbType.Int,0,true,true,false)
         { }
     }
 }

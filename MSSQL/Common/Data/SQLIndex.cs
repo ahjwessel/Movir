@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Common.Templates
+namespace Common.Data
 {
     public enum SQLIndexTypes : byte
     {
@@ -12,24 +12,22 @@ namespace Common.Templates
     }
     public abstract class SQLIndex : IDisposable
     {
-        #region Properties
         public string Name { get; private set; }
         public SQLIndexTypes IndexType { get; private set; }
         public string[] FieldNames { get; private set; }
         public abstract string CreateLine { get; }
-        #endregion
         public void Dispose()
         {
             this.Name = null;
             this.FieldNames = null;
         }
 
-        public SQLIndex(SQLIndexTypes parIndexType, string parName,
-                        params string[] parFieldNames)
+        public SQLIndex(SQLIndexTypes indexType, string name,
+                        params string[] fieldNames)
         {
-            this.IndexType = parIndexType;
-            this.Name = parName;
-            this.FieldNames = parFieldNames;
+            this.IndexType = indexType;
+            this.Name = name;
+            this.FieldNames = fieldNames;
         }
     }
 }

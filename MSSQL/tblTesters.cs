@@ -27,14 +27,14 @@ namespace MSSQL
                 return (MSSQLFields)base.Fields;
             }
         }
-        public static void CreateTable(MSSQLConnector parConnector)
+        public static void CreateTable(MSSQLConnector connector)
         {
-            MSSQLTable.CreateTable(parConnector, typeof(tblTesters));
+            MSSQLTable.CreateTable(connector, typeof(tblTesters));
         }
 
-        public void TestRead(MSSQLConnector parConnector)
+        public void TestRead(MSSQLConnector connector)
         {
-            this.pRead(parConnector, this.getSQL());
+            this.pRead(connector, this.GetSQL());
         }
 
         public tblTesters() : 

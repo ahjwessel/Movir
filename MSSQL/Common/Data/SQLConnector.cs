@@ -2,7 +2,7 @@
 using System.Data;
 using System.Data.Common;
 
-namespace Common.Templates
+namespace Common.Data
 {
     public abstract class SQLConnector: IDisposable
     {
@@ -27,31 +27,31 @@ namespace Common.Templates
         }
 
         internal protected abstract DbConnection CreateConnection();
-        internal protected abstract DbCommand CreateCommand(string parSQL);
+        internal protected abstract DbCommand CreateCommand(string SQL);
         internal protected abstract SQLRecordset CreateRecordset();
 
         #region OpenConnection/Reconnect/CloseConnection
-        public bool OpenConnection(string parHost, int parPort,
-                                   string parUsername, string parPassword)
+        public bool OpenConnection(string host, int port,
+                                   string username, string password)
         {
-            return this.OpenConnection(parHost, parPort, parUsername, parPassword, "");
+            return this.OpenConnection(host, port, username, password, "");
         }
-        public bool OpenConnection(string parHost, int parPort,
-                                   string parUsername, string parPassword,
-                                   string parDatabase)
+        public bool OpenConnection(string host, int port,
+                                   string username, string password,
+                                   string database)
         {
-            return this.OpenConnection(parHost, parPort, parUsername, parPassword, parDatabase, false);
+            return this.OpenConnection(host, port, username, password, database, false);
         }
-        protected bool OpenConnection(string parHost, int parPort,
-                                      string parUsername, string parPassword,
-                                      string parDatabase,
-                                      bool parReconnectProcedure)
+        protected bool OpenConnection(string host, int port,
+                                      string username, string password,
+                                      string database,
+                                      bool reconnectProcedure)
         {
             this.CloseConnection();
-            this.CurrentHostname = parHost;
-            this.CurrentPort = parPort;
-            this.CurrentUsername = parUsername;
-            this.CurrentPassword = parPassword;
+            this.CurrentHostname = host;
+            this.CurrentPort = port;
+            this.CurrentUsername = username;
+            this.CurrentPassword = password;
             this.ResetLastException();
 
             try
@@ -67,12 +67,12 @@ namespace Common.Templates
                 }
                 if (this.DBConnection.State == ConnectionState.Open)
                 {
-                    if (parDatabase != null && parDatabase != "")
+                    if (database != null && database != "")
                     {
-                        if (!this.SelectDatabase(parDatabase))
+                        if (!this.SelectDatabase(database))
                         {
-                            if (!parReconnectProcedure)
-                                throw new ApplicationException("Select database '" + parDatabase + "' in MySQL failed\n" + this.LastException.Message);
+                            if (!reconnectProcedure)
+                                throw new ApplicationException("Select database '" + database + "' in MySQL failed\n" + this.LastException.Message);
 
                             return false;
                         }
@@ -83,7 +83,7 @@ namespace Common.Templates
             }
             catch (Exception ex)
             {
-                if (!parReconnectProcedure)
+                if (!reconnectProcedure)
                     throw ex;
             }
 
@@ -115,41 +115,41 @@ namespace Common.Templates
         #endregion
 
         #region CreateDatabase/SelectDatabase/DeleteTable/Execute/OpenRecordset
-        public bool CreateDatabase(string parDatabaseName)
+        public bool CreateDatabase(string databaseName)
         {
-            if (this.pCreateDatabase(parDatabaseName))
+            if (this.PCreateDatabase(databaseName))
             {
-                this.SelectedDatabase = parDatabaseName;
+                this.SelectedDatabase = databaseName;
                 return true;
             }
             else
                 return false;
         }
-        protected abstract bool pCreateDatabase(string parDatabaseName);
-        public bool SelectDatabase(string parDatabase)
+        protected abstract bool PCreateDatabase(string databaseName);
+        public bool SelectDatabase(string database)
         {
-            if (this.pSelectDatabase(parDatabase))
+            if (this.pSelectDatabase(database))
             {
-                this.SelectedDatabase = parDatabase;
+                this.SelectedDatabase = database;
                 return true;
             }
             else
                 return false;
         }
-        protected abstract bool pSelectDatabase(string parDatabase);
-        public abstract void DeleteTable(string parTablename);
-        public int Execute(string parSQL)
+        protected abstract bool pSelectDatabase(string database);
+        public abstract void DeleteTable(string tablename);
+        public int Execute(string SQL)
         {
-            if (parSQL == "")
+            if (SQL == "")
                 return int.MinValue;
 
-            int varReturn = int.MinValue;
-            using (var cmd = this.CreateCommand(parSQL))
+            int returnValue = int.MinValue;
+            using (var command = this.CreateCommand(SQL))
             {
                 try
                 {
-                    cmd.CommandTimeout = this.TimeoutExecuteInSeconden;
-                    varReturn = cmd.ExecuteNonQuery();
+                    command.CommandTimeout = this.TimeoutExecuteInSeconden;
+                    returnValue = command.ExecuteNonQuery();
                 }
                 catch (Exception ex)
                 {
@@ -157,15 +157,15 @@ namespace Common.Templates
                 }
             }
 
-            return varReturn;
+            return returnValue;
         }
-        public SQLRecordset OpenRecordset(string parSQL)
+        public SQLRecordset OpenRecordset(string SQL)
         {
             var rec = this.CreateRecordset();
             this.ResetLastException();
             try
             {
-                if (!rec.OpenRecordset(parSQL))
+                if (!rec.OpenRecordset(SQL))
                 {
                     rec.Dispose();
                     rec = null;
@@ -198,37 +198,37 @@ namespace Common.Templates
         #endregion
 
         #region Read X fields of Y records
-        public object ReadFirstFieldOfFirstRecordSQL(string parSQL, object parDefaultValue)
+        public object ReadFirstFieldOfFirstRecordSQL(string SQL, object parDefaultValue)
         {
-            object[] mtxValues = this.ReadAllFieldsOfFirstRecordSQL(parSQL, new object[] { parDefaultValue });
+            object[] mtxValues = this.ReadAllFieldsOfFirstRecordSQL(SQL, new object[] { parDefaultValue });
             return mtxValues[0];
         }
-        public object[] ReadAllFieldsOfFirstRecordSQL(string parSQL, object[] parDefaultValues)
+        public object[] ReadAllFieldsOfFirstRecordSQL(string SQL, object[] defaultValues)
         {
             SQLRecordset rec;
-            rec = this.OpenRecordset(parSQL);
+            rec = this.OpenRecordset(SQL);
             if (rec == null)
-                return parDefaultValues;
+                return defaultValues;
             else if (rec.RecordCount == 0)
             {
                 rec.Dispose();
-                return parDefaultValues;
+                return defaultValues;
             }
 
-            object[] mtxReturn;
+            object[] returnValue;
             int varFieldCount;
             int varFieldCounter;
 
             varFieldCount = rec.Fields.Count;
-            mtxReturn = new object[varFieldCount];
+            returnValue = new object[varFieldCount];
 
             //Setting the defaultvalues
-            if (parDefaultValues != null)
+            if (defaultValues != null)
             {
                 for (varFieldCounter = 0; varFieldCounter <= varFieldCount - 1; varFieldCounter++)
                 {
-                    if (parDefaultValues.Length - 1 >= varFieldCounter)
-                        mtxReturn[varFieldCounter] = parDefaultValues[varFieldCounter];
+                    if (defaultValues.Length - 1 >= varFieldCounter)
+                        returnValue[varFieldCounter] = defaultValues[varFieldCounter];
                 }
             }
 
@@ -241,33 +241,31 @@ namespace Common.Templates
                     for (varFieldCounter = 1; varFieldCounter <= Math.Min(varFieldCount, rec.Fields.Count); varFieldCounter++)
                     {
                         if (Convert.ToString(rec.Fields[varFieldCounter].Value) + "" != "")
-                        {
-                            mtxReturn[varFieldCounter - 1] = rec.Fields[varFieldCounter].Value;
-                        }
+                            returnValue[varFieldCounter - 1] = rec.Fields[varFieldCounter].Value;
                     }
                 }
                 rec.Dispose();
                 rec = null;
             }
 
-            return mtxReturn;
+            return returnValue;
         }
-        public object[] ReadFirstFieldOfAllRecordSQL(string parSQL, object[] parDefaultValues)
+        public object[] ReadFirstFieldOfAllRecordSQL(string SQL, object[] defaultValues)
         {
-            object[] mtxReturn = null;
-            SQLRecordset rec = this.OpenRecordset(parSQL);
+            object[] returnValue = null;
+            SQLRecordset rec = this.OpenRecordset(SQL);
             if (rec == null || rec.RecordCount == 0)
             {
-                if (parDefaultValues != null)
-                    mtxReturn = parDefaultValues;
+                if (defaultValues != null)
+                    returnValue = defaultValues;
             }
             else
             {
-                mtxReturn = new object[rec.RecordCount];
+                returnValue = new object[rec.RecordCount];
                 int varCurrentRecordIndex = 0;
                 while (!rec.EOF)
                 {
-                    mtxReturn[varCurrentRecordIndex] = rec.Fields[1].Value;
+                    returnValue[varCurrentRecordIndex] = rec.Fields[1].Value;
                     rec.MoveNext();
                     varCurrentRecordIndex += 1;
                 }
@@ -276,64 +274,64 @@ namespace Common.Templates
             if (rec != null)
                 rec.Dispose();
 
-            return mtxReturn;
+            return returnValue;
         }
-        public object[,] ReadAllFieldsOfAllRecordSQL(string parSQL, object[] parDefaultValues)
+        public object[,] ReadAllFieldsOfAllRecordSQL(string SQL, object[] defaultValues)
         {
-            SQLRecordset rec = this.OpenRecordset(parSQL);
-            object[,] mtxReturn = null;
+            SQLRecordset rec = this.OpenRecordset(SQL);
+            object[,] returnValue = null;
             if (rec == null || rec.RecordCount == 0)
             {
-                if (parDefaultValues != null)
+                if (defaultValues != null)
                 {
-                    mtxReturn = new object[parDefaultValues.Length, 1];
-                    for (int varCounter = 0; varCounter < parDefaultValues.Length; varCounter++)
+                    returnValue = new object[defaultValues.Length, 1];
+                    for (int varCounter = 0; varCounter < defaultValues.Length; varCounter++)
                     {
-                        mtxReturn[varCounter, 0] = parDefaultValues[varCounter];
+                        returnValue[varCounter, 0] = defaultValues[varCounter];
                     }
                 }
             }
             else
-                mtxReturn = rec.getRows();
+                returnValue = rec.GetRows();
 
             if (rec != null)
                 rec.Dispose();
 
-            return mtxReturn;
+            return returnValue;
         }
         #endregion
 
         #region Check function
-        public bool HasDatabase(string parName)
+        public bool HasDatabase(string name)
         {
             var DatabaseNames = this.Databases;
             if (DatabaseNames != null)
             {
                 foreach (string DatabaseName in DatabaseNames)
                 {
-                    if (DatabaseName.ToLower() == parName.ToLower())
+                    if (DatabaseName.ToLower() == name.ToLower())
                         return true;
                 }
             }
             return false;
         }
-        public bool HasTable(string parName)
+        public bool HasTable(string name)
         {
-            var varTableNames = this.Tables;
-            if (varTableNames != null)
+            var tablenames = this.Tables;
+            if (tablenames != null)
             {
-                foreach (string varTableName in varTableNames)
+                foreach (string tablename in tablenames)
                 {
-                    if (varTableName.ToLower() == parName.ToLower())
+                    if (tablename.ToLower() == name.ToLower())
                         return true;
                 }
             }
             return false;
         }
-        public bool HasNoRecords(string parSQL)
+        public bool HasNoRecords(string SQL)
         {
             bool ReturnValue = false;
-            using (var rec = this.OpenRecordset(parSQL))
+            using (var rec = this.OpenRecordset(SQL))
             {
                 if (rec != null)
                 {
@@ -346,23 +344,23 @@ namespace Common.Templates
         }
         #endregion
 
-        public static string getEnumToTextSubquery(string parFieldname,
-                                                   bool parEnumvalueAsText,
-                                                   Type parEnum,
-                                                   string parUnknownText)
+        public static string GetEnumToTextSubquery(string fieldname,
+                                                   bool enumvalueAsText,
+                                                   Type enumType,
+                                                   string UnknownText)
         {
             //CASE value WHEN [compare_value] THEN result [WHEN [compare_value] THEN result ...] [ELSE result] END 
-            string varReturn = "";
-            foreach (object EnumValue in Enum.GetValues(parEnum))
+            string returnValue = "";
+            foreach (object EnumValue in Enum.GetValues(enumType))
             {
-                if (parEnumvalueAsText)
-                    varReturn += "WHEN \"" + ((char) Convert.ToInt32(EnumValue)).ToString() + "\"";
+                if (enumvalueAsText)
+                    returnValue += "WHEN \"" + ((char) Convert.ToInt32(EnumValue)).ToString() + "\"";
                 else
-                    varReturn += "WHEN " + Convert.ToInt32(EnumValue).ToString();
-                varReturn += " THEN \"" + Enum.GetName(parEnum, EnumValue) + "\" ";
+                    returnValue += "WHEN " + Convert.ToInt32(EnumValue).ToString();
+                returnValue += " THEN \"" + Enum.GetName(enumType, EnumValue) + "\" ";
             }
-            varReturn = "(CASE " + parFieldname + " " + varReturn + "ELSE \"" + parUnknownText + "\" END)";
-            return varReturn;
+            returnValue = "(CASE " + fieldname + " " + returnValue + "ELSE \"" + UnknownText + "\" END)";
+            return returnValue;
         }
 
         public virtual void Dispose()

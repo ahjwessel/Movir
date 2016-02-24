@@ -1,36 +1,36 @@
-﻿using Common.Templates;
+﻿using Common.Data;
 
 namespace MSSQL
 {
     public class MSSQLTable:SQLTable
     { 
-        protected override void pCreateTable(SQLConnector parConnector, params SQLIndex[] parIndexes)
+        protected override void pCreateTable(SQLConnector connector, params SQLIndex[] indexes)
         {
-            System.Text.StringBuilder sbFields = new System.Text.StringBuilder();
-            foreach (MSSQLField fld in this.Fields)
+            System.Text.StringBuilder fields = new System.Text.StringBuilder();
+            foreach (MSSQLField field in this.Fields)
             {
-                if (sbFields.Length > 0)
-                    sbFields.Append(",");
-                sbFields.Append(fld.CreateLine);
+                if (fields.Length > 0)
+                    fields.Append(",");
+                fields.Append(field.CreateLine);
             }
 
             string sqlstr = "CREATE TABLE " + this.Tablename + " (" +
-                            sbFields.ToString() +
+                            fields.ToString() +
                             ") ";
-            parConnector.Execute(sqlstr);
+            connector.Execute(sqlstr);
 
             System.Text.StringBuilder sbIndexes = new System.Text.StringBuilder();
-            if (parIndexes != null && parIndexes.Length > 0)
+            if (indexes != null && indexes.Length > 0)
             {
-                foreach (MSSQLIndex ind in parIndexes)
+                foreach (MSSQLIndex ind in indexes)
                 {
                     ind.Tablename = this.Tablename;
-                    parConnector.Execute(ind.CreateLine);
+                    connector.Execute(ind.CreateLine);
                 }
             }
         }
-        public MSSQLTable(string parTablename, params MSSQLField[] parFields)
-            : base(parTablename,new MSSQLFields(parFields))
+        public MSSQLTable(string tablename, params MSSQLField[] parFields)
+            : base(tablename,new MSSQLFields(parFields))
         { }
     }
 }

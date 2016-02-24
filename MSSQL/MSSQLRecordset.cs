@@ -1,13 +1,13 @@
 ﻿using System.Data;
-using Common.Templates;
+using Common.Data;
 
 namespace MSSQL
 {
     public class MSSQLRecordset : SQLRecordset
     {
-        protected override SQLRecord CreateRecord(DataTable parSchemaTable, DataSet parDataSet)
+        protected override SQLRecord CreateRecord(DataTable schemaTable, DataSet dataSet)
         {
-            return new MSSQLRecord(parSchemaTable, parDataSet);
+            return new MSSQLRecord(schemaTable, dataSet);
         }
 
         public MSSQLRecordset(MSSQLConnector parConnection)

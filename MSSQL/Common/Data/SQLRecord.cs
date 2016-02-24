@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Data;
 
-namespace Common.Templates
+namespace Common.Data
 {
     public abstract class SQLRecord:IDisposable
     {
         public SQLFields Fields { get; protected set; }
 
-        internal void Refresh(DataRow parRow)
+        internal void Refresh(DataRow row)
         {
             if (this.Fields != null)
-                this.Fields.Refresh(parRow);
+                this.Fields.Refresh(row);
         }
         internal void ClearValues()
         {
@@ -20,11 +20,7 @@ namespace Common.Templates
 
         public void Dispose()
         {
-            if (this.Fields != null)
-            {
-                this.Fields.Dispose();
-                this.Fields = null;
-            }
+            this.Fields.Dispose();
         }
 
         public SQLRecord(SQLFields parFields)

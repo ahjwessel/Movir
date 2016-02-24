@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Data;
-using Common.Templates;
+using Common.Data;
 
 namespace MSSQL
 {
     public class MSSQLField:SQLField
     {
-        public SqlDbType Type { get; protected set; }
+        public SqlDbType Type { get; private set; }
 
         public override string CreateLine
         {
@@ -19,31 +19,31 @@ namespace MSSQL
             }
         }
 
-        protected override string ConvertValueToSQL(object parValue)
+        protected override string ConvertValueToSQL(object value)
         {
-            return MSSQLConnector.ConvertValueToSQL(this.Type, parValue, this.AllowDBNull);
+            return MSSQLConnector.ConvertValueToSQL(this.Type, value, this.AllowDBNull);
         }
 
-        protected override object ConvertSQLToValue(object parSQLValue)
+        protected override object ConvertSQLToValue(object SQLValue)
         {
-            return MSSQLConnector.ConvertSQLToValue(this.Type, parSQLValue);
+            return MSSQLConnector.ConvertSQLToValue(this.Type, SQLValue);
         }
 
-        public MSSQLField(string parName, SqlDbType parType, object parInitValue)
-            : this(parName, parType, parInitValue, false)
+        public MSSQLField(string name, SqlDbType SQLType, object InitValue)
+            : this(name, SQLType, InitValue, false)
         { }
-        public MSSQLField(string parName, SqlDbType parType, object parInitValue, bool parIsPrimaryKey)
-            :this(parName,parType,parInitValue,parIsPrimaryKey,false,true)
+        public MSSQLField(string name, SqlDbType SQLType, object InitValue, bool isPrimaryKey)
+            :this(name,SQLType,InitValue,isPrimaryKey,false,true)
         { }
-        public MSSQLField(string parName, SqlDbType parType,object parInitValue,bool parIsPrimaryKey,bool parIsAutonumber, bool parAllowDBNull)
-            :base(parName,parInitValue,parIsPrimaryKey,parIsAutonumber,parAllowDBNull)
+        public MSSQLField(string name, SqlDbType SQLType,object InitValue,bool isPrimaryKey,bool isAutonumber, bool allowDBNull)
+            :base(name,InitValue,isPrimaryKey,isAutonumber,allowDBNull)
         {
-            this.Type = parType;
+            this.Type = SQLType;
         }
-        public MSSQLField(int parFieldIndex, DataTable parSchemaTable)
-            :base(parFieldIndex,parSchemaTable)
+        public MSSQLField(int fieldIndex, DataTable schemaTable)
+            :base(fieldIndex,schemaTable)
         {
-            this.Type = (SqlDbType)Enum.Parse(typeof(SqlDbType), parSchemaTable.Rows[parFieldIndex]["ProviderType"].ToString());
+            this.Type = (SqlDbType)Enum.Parse(typeof(SqlDbType), schemaTable.Rows[fieldIndex]["ProviderType"].ToString());
         }
     }
 }

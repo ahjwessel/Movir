@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Common.Templates
+namespace Common.Data
 {
     public abstract class Table : IDisposable
     {
@@ -47,10 +47,10 @@ namespace Common.Templates
         {
             this.SetFlags(true, true);
         }
-        protected void SetFlags(bool parIsNew, bool parIsFound)
+        protected void SetFlags(bool isNew, bool isFound)
         {
-            this.IsNew = parIsNew;
-            this.IsFound = parIsFound;
+            this.IsNew = isNew;
+            this.IsFound = isFound;
         }
 
         public virtual void Dispose()
@@ -59,9 +59,9 @@ namespace Common.Templates
             this.Fields.Dispose();
         }
 
-        protected Table(string parTablename, Fields parFields)
+        protected Table(string tablename, Fields parFields)
         {
-            this.Tablename = parTablename;
+            this.Tablename = tablename;
             this.Fields = parFields;
 
             this.CreateNew();

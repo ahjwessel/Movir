@@ -63,8 +63,8 @@ namespace MSSQL
             }
         }
 
-        public MSSQLImageField(string parName)
-            : base(parName, System.Data.SqlDbType.Image)
+        public MSSQLImageField(string name)
+            : base(name, System.Data.SqlDbType.Image)
         { }
     }
 }
