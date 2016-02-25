@@ -52,18 +52,18 @@
   <ItemGroup>
     <Compile Include="Common\Data\SQLIndex.cs" />
     <Compile Include="Common\Data\SQLTable.cs" />
-    <Compile Include="MSSQLAutonumberField.cs" />
-    <Compile Include="MSSQLBinaryField.cs" />
-    <Compile Include="MSSQLConnector.cs" />
-    <Compile Include="MSSQLImageField.cs" />
-    <Compile Include="MSSQLIndex.cs" />
-    <Compile Include="MSSQLRecord.cs" />
-    <Compile Include="MSSQLRecordset.cs" />
+    <Compile Include="MSSQL\MSSQLAutonumberField.cs" />
+    <Compile Include="MSSQL\MSSQLBinaryField.cs" />
+    <Compile Include="MSSQL\MSSQLConnector.cs" />
+    <Compile Include="MSSQL\MSSQLImageField.cs" />
+    <Compile Include="MSSQL\MSSQLIndex.cs" />
+    <Compile Include="MSSQL\MSSQLRecord.cs" />
+    <Compile Include="MSSQL\MSSQLRecordset.cs" />
     <Compile Include="Common\Data\SQLConnector.cs" />
-    <Compile Include="MSSQLField.cs" />
-    <Compile Include="MSSQLFields.cs" />
-    <Compile Include="MSSQLTable.cs" />
-    <Compile Include="MSSQLTextField.cs" />
+    <Compile Include="MSSQL\MSSQLField.cs" />
+    <Compile Include="MSSQL\MSSQLFields.cs" />
+    <Compile Include="MSSQL\MSSQLTable.cs" />
+    <Compile Include="MSSQL\MSSQLTextField.cs" />
     <Compile Include="Common\Data\Field.cs" />
     <Compile Include="Common\Data\Fields.cs" />
     <Compile Include="Form1.cs">
@@ -72,7 +72,7 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="MySQLField.cs" />
+    <Compile Include="MSSQL\MySQLField.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Common\Data\SQLField.cs" />
@@ -80,7 +80,7 @@
     <Compile Include="Common\Data\SQLRecord.cs" />
     <Compile Include="Common\Data\SQLRecordset.cs" />
     <Compile Include="Common\Data\Table.cs" />
-    <Compile Include="tblTesters.cs" />
+    <Compile Include="MSSQL\tblTesters.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>

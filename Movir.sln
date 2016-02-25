@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MVC6 onderzoek", "MVC6 onde
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Excel Library", "Excel Library\Excel Library.csproj", "{084E2199-E496-413F-88E5-7E1590ED6B8C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSSQL", "MSSQL\MSSQL.csproj", "{FB13913F-1DE7-4643-A202-B4DE185A28B1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Connectors", "Connectors\Connectors.csproj", "{FB13913F-1DE7-4643-A202-B4DE185A28B1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
