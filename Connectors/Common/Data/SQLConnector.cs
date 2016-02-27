@@ -285,9 +285,9 @@ namespace Common.Data
                 if (defaultValues != null)
                 {
                     returnValue = new object[defaultValues.Length, 1];
-                    for (int varCounter = 0; varCounter < defaultValues.Length; varCounter++)
+                    for (int counter = 0; counter < defaultValues.Length; counter++)
                     {
-                        returnValue[varCounter, 0] = defaultValues[varCounter];
+                        returnValue[counter, 0] = defaultValues[counter];
                     }
                 }
             }

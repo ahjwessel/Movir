@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using Common.Data;
 
-namespace MSSQL
+namespace Common.Data
 {
     public abstract class SQLTable:Table
     {

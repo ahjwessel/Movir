@@ -8,6 +8,7 @@ namespace MSSQL
 {
     public class MSSQLConnector : SQLConnector
     {
+        #region Properties
         public override string[] Databases
         {
             get
@@ -23,17 +24,16 @@ namespace MSSQL
                 }
 
                 var returnValue = new string[rec.RecordCount];
-                var mtxRows = rec.GetRows();
+                var rowValue = rec.GetRows();
 
-                for (int varCounter=0;varCounter<returnValue.Length;varCounter++)
+                for (int counter=0;counter<returnValue.Length;counter++)
                 {
-                    returnValue[varCounter] = mtxRows[0, varCounter].ToString();
+                    returnValue[counter] = rowValue[0, counter].ToString();
                 }
 
                 return returnValue;
             }
         }
-
         public override DateTime SystemDateTime
         {
             get
@@ -41,7 +41,6 @@ namespace MSSQL
                 return (DateTime)this.ReadFirstFieldOfFirstRecordSQL("SELECT CURDATE()", DateTime.MinValue);
             }
         }
-
         public override string[] Tables
         {
             get
@@ -57,17 +56,19 @@ namespace MSSQL
                 }
 
                 var returnValue = new string[rec.RecordCount];
-                var mtxRows = rec.GetRows();
+                var rowValue = rec.GetRows();
 
-                for (int varCounter = 0; varCounter < returnValue.Length; varCounter++)
+                for (int counter = 0; counter < returnValue.Length; counter++)
                 {
-                    returnValue[varCounter] = mtxRows[0, varCounter].ToString();
+                    returnValue[counter] = rowValue[0, counter].ToString();
                 }
 
                 return returnValue;
             }
         }
+        #endregion
 
+        #region Protected
         protected override bool PCreateDatabase(string databaseName)
         {
             try
@@ -80,7 +81,6 @@ namespace MSSQL
                 throw ex;
             }
         }
-
         protected override bool pSelectDatabase(string database)
         {
             try
@@ -93,12 +93,10 @@ namespace MSSQL
                 throw ex;
             }
         }
-
         protected internal override DbCommand CreateCommand(string SQL)
         {
             return new System.Data.SqlClient.SqlCommand(SQL,(System.Data.SqlClient.SqlConnection)this.DBConnection);
         }
-
         protected internal override DbConnection CreateConnection()
         {
             if (this.CurrentUsername=="")
@@ -106,12 +104,13 @@ namespace MSSQL
             else
                 return new System.Data.SqlClient.SqlConnection("Server=" + this.CurrentHostname + "; User Id=" + this.CurrentUsername + "; Password=" + this.CurrentPassword);
         }
-
         protected internal override SQLRecordset CreateRecordset()
         {
             return new MSSQLRecordset(this);
         }
+        #endregion
 
+        #region ConvertValueToSQL/ConvertSQLToValue
         public static string ConvertValueToSQL(SqlDbType SQLType,object value,bool allowDBNull)
         {
             switch (SQLType)
@@ -241,11 +240,14 @@ namespace MSSQL
                     return Convert.ToString(value);
             }
         }
+        #endregion
 
+        #region Publics
         public override void DeleteTable(string tablename)
         {
             string sqlstr = "IF OBJECT_ID('dbo.~', 'U') IS NOT NULL DROP TABLE dbo.~".Replace("~",tablename);
             this.Execute(sqlstr);
         }
+        #endregion
     }
 }

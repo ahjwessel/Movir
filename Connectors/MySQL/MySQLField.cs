@@ -1,29 +1,33 @@
 ﻿using System;
-using Common.Data;
 using System.Data;
 using MySql.Data.MySqlClient;
+using Common.Data;
 
-namespace MSSQL
+namespace MySQL
 {
     public class MySQLField:SQLField
     {
         public MySqlDbType Type { get; private set; }
 
-        protected override string ConvertValueToSQL(object value)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override object ConvertSQLToValue(object SQLValue)
-        {
-            throw new NotImplementedException();
-        }
         public override string CreateLine
         {
             get
             {
-                throw new NotImplementedException();
+                return this.Name + " " +
+                       this.Type.ToString() + " " +
+                       (this.IsPrimaryKey ? "PRIMARY KEY " : "") +
+                       (this.AllowDBNull ? "" : "NOT NULL");
             }
+        }
+
+        protected override string ConvertValueToSQL(object value)
+        {
+            return MySQLConnector.ConvertValueToSQL(this.Type, value, this.AllowDBNull);
+        }
+
+        protected override object ConvertSQLToValue(object SQLValue)
+        {
+            return MySQLConnector.ConvertSQLToValue(this.Type, SQLValue);
         }
 
         public MySQLField(string name, MySqlDbType SQLType, object InitValue)

@@ -26,9 +26,9 @@ namespace MSSQL
         public MSSQLFields(DataTable schemaTable, DataSet dataSet)
         {
             _fields = new MSSQLField[schemaTable.Rows.Count];
-            for (int varCounter = 0; varCounter < schemaTable.Rows.Count; varCounter++)
+            for (int counter = 0; counter < schemaTable.Rows.Count; counter++)
             {
-                _fields[varCounter] = new MSSQLField(varCounter, schemaTable);
+                _fields[counter] = new MSSQLField(counter, schemaTable);
             }
         }
     }

@@ -4,10 +4,11 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MySql.Data.MySqlClient;
 
-namespace MSSQL
+namespace MySQL
 {
-    public class tblTesters : MSSQLTable
+    public class tblTesters : MySQLTable
     {
         public string Naam
         {
@@ -20,31 +21,31 @@ namespace MSSQL
                 this.Fields["Naam"].Value = value;
             }
         }
-        new public MSSQLFields Fields
+        new public MySQLFields Fields
         {
             get
             {
-                return (MSSQLFields)base.Fields;
+                return (MySQLFields)base.Fields;
             }
         }
-        public static void CreateTable(MSSQLConnector connector)
+        public static void CreateTable(MySQLConnector connector)
         {
-            MSSQLTable.CreateTable(connector, typeof(tblTesters));
+            MySQLTable.CreateTable(connector, typeof(tblTesters));
         }
 
-        public void TestRead(MSSQLConnector connector)
+        public void TestRead(MySQLConnector connector)
         {
             this.pRead(connector, this.GetSQL());
         }
 
         public tblTesters() : 
-            base("tblTesters", new MSSQLAutonumberField("ID"), 
-                new MSSQLTextField("Naam",255,true,""),
-                new MSSQLField("Nummer",SqlDbType.Int,0),
-                new MSSQLField("Datum",SqlDbType.Date,DateTime.Now.Date),
-                new MSSQLField("Decimal",SqlDbType.Float,0),
-                new MSSQLBinaryField("Binary"),
-                new MSSQLImageField("Image"))
+            base("tblTesters", new MySQLAutonumberField("ID"), 
+                new MySQLTextField("Naam",255,""),
+                new MySQLField("Nummer",MySqlDbType.Int24,0),
+                new MySQLField("Datum", MySqlDbType.Date,DateTime.Now.Date),
+                new MySQLField("Decimal", MySqlDbType.Float,0),
+                new MySQLBinaryField("Binary"),
+                new MySQLImageField("Image"))
         {}
     }
 }

@@ -7,8 +7,8 @@
     <ProjectGuid>{FB13913F-1DE7-4643-A202-B4DE185A28B1}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MSSQL</RootNamespace>
-    <AssemblyName>MSSQL</AssemblyName>
+    <RootNamespace>MySQL</RootNamespace>
+    <AssemblyName>MySQL</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -72,7 +72,18 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="MSSQL\MySQLField.cs" />
+    <Compile Include="MySQL\MySQLAutonumberField.cs" />
+    <Compile Include="MySQL\MySQLBinaryField.cs" />
+    <Compile Include="MySQL\MySQLImageField.cs" />
+    <Compile Include="MySQL\MySQLTextField.cs" />
+    <Compile Include="MySQL\MySQLConnector.cs" />
+    <Compile Include="MySQL\MySQLField.cs" />
+    <Compile Include="MySQL\MySQLFields.cs" />
+    <Compile Include="MySQL\MySQLIndex.cs" />
+    <Compile Include="MySQL\MySQLRecord.cs" />
+    <Compile Include="MySQL\MySQLRecordset.cs" />
+    <Compile Include="MySQL\MySQLTable.cs" />
+    <Compile Include="MySQL\tblTesters.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Common\Data\SQLField.cs" />
@@ -92,6 +103,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
