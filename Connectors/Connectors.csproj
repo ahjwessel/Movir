@@ -7,8 +7,8 @@
     <ProjectGuid>{FB13913F-1DE7-4643-A202-B4DE185A28B1}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MySQL</RootNamespace>
-    <AssemblyName>MySQL</AssemblyName>
+    <RootNamespace>Connectors</RootNamespace>
+    <AssemblyName>Connectors</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -55,6 +55,7 @@
     <Compile Include="MSSQL\MSSQLAutonumberField.cs" />
     <Compile Include="MSSQL\MSSQLBinaryField.cs" />
     <Compile Include="MSSQL\MSSQLConnector.cs" />
+    <Compile Include="MSSQL\MSSQLDecimalField.cs" />
     <Compile Include="MSSQL\MSSQLImageField.cs" />
     <Compile Include="MSSQL\MSSQLIndex.cs" />
     <Compile Include="MSSQL\MSSQLRecord.cs" />

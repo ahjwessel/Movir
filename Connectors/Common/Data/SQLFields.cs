@@ -85,7 +85,7 @@ namespace Common.Data
             if (primaryKeysWhere == null)
                 return "";
             else
-                return "DELETE * FROM " + tablename + "WHERE " + primaryKeysWhere;
+                return "DELETE FROM " + tablename + " WHERE " + primaryKeysWhere;
         }
         #endregion
 

@@ -13,6 +13,14 @@ namespace MySQL
         {
             get
             {
+                /*
+                string ColumnType;
+                switch (this.Type)
+                {
+                    case MySqlDbType.Binary:
+
+                }
+                */
                 return this.Name + " " +
                        this.Type.ToString() + " " +
                        (this.IsPrimaryKey ? "PRIMARY KEY " : "") +

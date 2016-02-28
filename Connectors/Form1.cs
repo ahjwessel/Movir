@@ -40,6 +40,8 @@ namespace MSSQL
                 //pic.Image = new Bitmap(new System.IO.MemoryStream((byte[])tbl.Fields["Image"].Value));
                 tbl.Fields["Binary"].Value = new System.IO.MemoryStream(System.Text.Encoding.Default.GetBytes("blabla"));
                 tbl.Save(sql);
+
+                tbl.Delete(sql);
             }
 
             return;

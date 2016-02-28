@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace MySQL.Properties {
+namespace Connectors.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]

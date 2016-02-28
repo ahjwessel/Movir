@@ -42,7 +42,7 @@ namespace MSSQL
                 new MSSQLTextField("Naam",255,true,""),
                 new MSSQLField("Nummer",SqlDbType.Int,0),
                 new MSSQLField("Datum",SqlDbType.Date,DateTime.Now.Date),
-                new MSSQLField("Decimal",SqlDbType.Float,0),
+                new MSSQLDecimalField("Decimal",20,10,0),
                 new MSSQLBinaryField("Binary"),
                 new MSSQLImageField("Image"))
         {}
